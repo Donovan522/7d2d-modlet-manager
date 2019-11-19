@@ -1,17 +1,44 @@
 {
   "name": "7d2d-modlet-manager",
+  "description": "7 Days to Die Modlet Manager",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Donovan C. Young",
+    "email": "Donovan.C.Young@gmail.com",
+    "url": "https://donovanyoung.com"
+  },
+  "build": {
+    "appId": "com.donovanyoung.7d2d-modlet-manager",
+    "productName": "7 Days to Die Modlet Manager",
+    "copyright": "Copyright © 2019 ${author}",
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
+  },
   "dependencies": {
+    "electron-is-dev": "^1.1.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-scripts": "3.2.0"
   },
+  "homepage": "./",
+  "main": "public/electron.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "rescripts test",
+    "electron-dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "postinstall": "electron-builder install-app-deps",
+    "preelectron-pack": "yarn build",
+    "electron-pack": "build -w"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -27,5 +54,19 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@hot-loader/react-dom": "^16.11.0",
+    "@rescripts/cli": "^0.0.13",
+    "@rescripts/rescript-env": "^0.0.11",
+    "concurrently": "^5.0.0",
+    "cross-env": "^6.0.3",
+    "electron": "^7.1.1",
+    "electron-builder": "^21.2.0",
+    "react-app-rewire-hot-loader": "^2.0.1",
+    "react-app-rewired": "^2.1.5",
+    "react-hot-loader": "^4.12.18",
+    "typescript": "^3.7.2",
+    "wait-on": "^3.3.0"
   }
 }
