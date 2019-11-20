@@ -21,10 +21,26 @@ const ModletComponent = (props: ModletProps) => {
     modlet.enable(event.target.checked);
   };
 
+  let formControl: React.ReactNode;
+
+  if (!props.advancedMode) {
+    // what to render in Basic mode
+    formControl = (
+      <FormControlLabel
+        style={{ marginLeft: "auto" }}
+        control={<Switch size="small" checked={enabled} onChange={e => handleEnableClick(e, props.modlet)} />}
+        label={enabled ? "Enabled" : "Disabled"}
+      />
+    );
+  } else {
+    // What to render in advancedMode
+    formControl = <span />;
+  }
+
   return (
     <Card>
       <CardContent>
-        <Typography>{props.modlet.name}</Typography>
+        <Typography variant="body1">{props.modlet.name}</Typography>
         <Typography variant="body2" color="textSecondary">
           {props.modlet.description}
         </Typography>
@@ -33,15 +49,7 @@ const ModletComponent = (props: ModletProps) => {
           {props.modlet.compat !== "unknown" && <i>(compatible with: {props.modlet.compat})</i>}
         </Typography>
       </CardContent>
-      <CardActions>
-        {props.advancedMode || (
-          <FormControlLabel
-            style={{ marginLeft: "auto" }}
-            control={<Switch size="small" checked={enabled} onChange={e => handleEnableClick(e, props.modlet)} />}
-            label={enabled ? "Enabled" : "Disabled"}
-          />
-        )}
-      </CardActions>
+      <CardActions>{formControl}</CardActions>
     </Card>
   );
 };

@@ -32,12 +32,12 @@
     "start": "rescripts start",
     "build": "rescripts build",
     "dist": "yarn build && electron-builder",
-    "test": "rescripts test --env=jsdom",
-    "electron-dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "test": "react-scripts test --env=jsdom",
+    "dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
     "electron-pack": "build -w",
-    "lint": "eslint src --ext .js --ext .jsx --ext .ts --ext .tsx"
+    "lint": "eslint src --ext .ts --ext .tsx"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -80,9 +80,12 @@
     "cross-env": "^6.0.3",
     "electron-builder": "^21.2.0",
     "electron-is-dev": "^1.1.0",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
     "react-app-rewire-hot-loader": "^2.0.1",
     "react-app-rewired": "^2.1.5",
     "react-hot-loader": "^4.12.18",
+    "react-test-renderer": "^16.12.0",
     "typescript": "^3.7.2",
     "wait-on": "^3.3.0"
   }

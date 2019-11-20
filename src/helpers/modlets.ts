@@ -7,7 +7,8 @@ export class Modlet {
   compat: string;
   description: string;
   enabled: boolean;
-  modInfo: string;
+  modInfoFile: string;
+  modInfoXML: string;
   name: string;
   version: string;
 
@@ -22,8 +23,6 @@ export class Modlet {
         explicitArray: false
       });
 
-      console.log("Reading from", file);
-
       xmlparser.parseString(fs.readFileSync(file, "utf8"), (err: Error, xmlfile: any) => {
         if (err) {
           console.log("ERROR:", err);
@@ -32,33 +31,33 @@ export class Modlet {
         }
 
         xml = xmlfile.modinfo;
-        console.log(xml);
       });
     }
 
-    this.author = xml.author.$.value || "unknown";
-    this.compat = "compat" in xml.version.$ ? xml.version.$.compat : "unknown";
+    this.author = Modlet._getXMLValue(xml, "author");
+    this.compat = Modlet._getXMLValue(xml, "version", "compat");
     this.description = xml.description.$.value || "unknown";
     this.enabled = !path.basename(file).match(/disabled/i);
-    this.modInfo = file;
+    this.modInfoFile = file;
+    this.modInfoXML = xml;
     this.name = xml.name.$.value || "unknown";
     this.version = xml.version.$.value || "unknown";
   }
 
-  _renameModInfo(newModInfo: string) {
-    fs.renameSync(this.modInfo, newModInfo);
-    this.modInfo = newModInfo;
+  _renameModInfo(newModInfoFile: string) {
+    fs.renameSync(this.modInfoFile, newModInfoFile);
+    this.modInfoFile = newModInfoFile;
   }
 
   enable(enabled: boolean) {
     // disable request
     if (!enabled && this.enabled) {
-      this._renameModInfo(path.join(path.dirname(this.modInfo), "disabled-ModInfo.xml"));
+      this._renameModInfo(path.join(path.dirname(this.modInfoFile), "disabled-ModInfo.xml"));
     }
 
     // enable request
     if (enabled && !this.enabled) {
-      this._renameModInfo(path.join(path.dirname(this.modInfo), "ModInfo.xml"));
+      this._renameModInfo(path.join(path.dirname(this.modInfoFile), "ModInfo.xml"));
     }
 
     this.enabled = enabled;
@@ -66,6 +65,12 @@ export class Modlet {
 
   // TODO: Validate code goes here
   // validate(gameFolder: string) {}
+
+  // class methods
+  static _getXMLValue(xml: any, key: string, valueKey: string = "value"): string {
+    if (xml && key in xml) return xml[key].$[valueKey];
+    return "unknown";
+  }
 }
 
 export function getModlets(searchFolder: string): Modlet[] {

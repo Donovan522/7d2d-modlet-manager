@@ -1,26 +1,43 @@
 const electron = require("electron");
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
-
+const grey = require("@material-ui/core/colors/grey");
 const path = require("path");
 const isDev = require("electron-is-dev");
+const windowStateKeeper = require("electron-window-state");
 
 let mainWindow;
 
 function createWindow() {
+  let state = windowStateKeeper({
+    defaultWidth: 1000,
+    defaultHeight: 800
+  });
+
   mainWindow = new BrowserWindow({
-    width: 900,
-    height: 680,
+    title: "7 Days 2 Die Modlet Manager",
+    x: state.x,
+    y: state.y,
+    width: state.width,
+    height: state.height,
+    minWidth: 1000,
+    minHeight: 800,
+    backgroundColor: grey[300],
     webPreferences: {
       nodeIntegration: true
     }
   });
+
+  state.manage(mainWindow);
+
   mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`);
   if (isDev) {
+    process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
     // Open the DevTools.
     //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
     mainWindow.webContents.openDevTools();
   }
+
   mainWindow.on("closed", () => (mainWindow = null));
 }
 
