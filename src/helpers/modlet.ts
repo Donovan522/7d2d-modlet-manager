@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { Parser } from "xml2js";
 
-export class Modlet {
+export default class Modlet {
   author: string;
   compat: string;
   description: string;
@@ -36,12 +36,12 @@ export class Modlet {
 
     this.author = Modlet._getXMLValue(xml, "author");
     this.compat = Modlet._getXMLValue(xml, "version", "compat");
-    this.description = xml.description.$.value || "unknown";
+    this.description = Modlet._getXMLValue(xml, "description");
     this.enabled = !path.basename(file).match(/disabled/i);
     this.modInfoFile = file;
     this.modInfoXML = xml;
-    this.name = xml.name.$.value || "unknown";
-    this.version = xml.version.$.value || "unknown";
+    this.name = Modlet._getXMLValue(xml, "name");
+    this.version = Modlet._getXMLValue(xml, "version");
   }
 
   _renameModInfo(newModInfoFile: string) {
@@ -71,27 +71,4 @@ export class Modlet {
     if (xml && key in xml) return xml[key].$[valueKey];
     return "unknown";
   }
-}
-
-export function getModlets(searchFolder: string): Modlet[] {
-  let modletArray: Modlet[] = [];
-
-  if (!searchFolder) return modletArray;
-  if (!fs.existsSync(searchFolder)) return modletArray;
-
-  fs.readdirSync(searchFolder).forEach(entry => {
-    const filename = path.join(searchFolder, entry);
-
-    if (fs.statSync(filename).isDirectory()) {
-      fs.readdirSync(filename).some(file => {
-        if (file.match(/modinfo/i)) {
-          modletArray.push(new Modlet(path.join(filename, file)));
-          return true;
-        }
-        return false;
-      });
-    }
-  });
-
-  return modletArray;
 }

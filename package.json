@@ -32,7 +32,7 @@
     "start": "rescripts start",
     "build": "rescripts build",
     "dist": "yarn build && electron-builder",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",

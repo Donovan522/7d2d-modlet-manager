@@ -4,9 +4,9 @@ import CardContent from "@material-ui/core/CardContent";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Typography from "@material-ui/core/Typography";
+import { Modlet } from "helpers";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
-import { Modlet } from "../../helpers";
 
 interface ModletProps {
   advancedMode: boolean;

@@ -1,13 +1,13 @@
 import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
-import fs from "fs";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import Modlet from "components/Modlet";
+import fs from "fs";
 import path from "path";
 import PropTypes from "prop-types";
-import React, { useState, useEffect } from "react";
-import Modlet from "../Modlet";
+import React, { useEffect, useState } from "react";
 
 interface ModletsProps {
   advancedMode: boolean;
@@ -80,16 +80,16 @@ const Modlets = (props: ModletsProps) => {
 
   const [button, setButton] = useState();
 
-  const createModsFolder = () => {
-    if (!fs.existsSync(modsPath)) {
-      fs.mkdirSync(modsPath);
-      setButton(undefined);
-    }
-  };
-
   modletList = props.modlets.length ? modletsList(props, classes) : noModlets(modsPath, button, classes);
 
   useEffect(() => {
+    const createModsFolder = () => {
+      if (!fs.existsSync(modsPath)) {
+        fs.mkdirSync(modsPath);
+        setButton(undefined);
+      }
+    };
+
     if (!button && !fs.existsSync(modsPath)) {
       setButton(
         <Button className={classes.button} onClick={createModsFolder}>
@@ -97,7 +97,7 @@ const Modlets = (props: ModletsProps) => {
         </Button>
       );
     }
-  }, [button, modsPath, classes.button, createModsFolder]);
+  }, [button, modsPath, classes.button]);
 
   return (
     <Grid container spacing={2} className={classes.root}>

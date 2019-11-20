@@ -32,6 +32,7 @@ function createWindow() {
 
   mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`);
   if (isDev) {
+    delete process.env.ELECTRON_ENABLE_SECURITY_WARNINGS;
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
     // Open the DevTools.
     //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');

@@ -8,27 +8,30 @@ import Switch from "@material-ui/core/Switch";
 import FolderPicker from "components/FolderPicker";
 import Modlets from "components/Modlets";
 import { remote } from "electron";
-import Store from "electron-store";
 import { getModlets } from "helpers";
 import path from "path";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { hot } from "react-hot-loader";
 import theme from "theme";
 
 const useStyles = makeStyles(() => ({
   mainContainer: {
-    flexGrow: 1,
+    // flexGrow: 1,
     marginTop: 10
   }
 }));
 
-const App: React.FC = () => {
+interface AppProps {
+  store: any;
+}
+
+const App = (props: AppProps) => {
   const classes = useStyles();
-  const config = new Store({ name: "7d2dmm" });
+  const config = props.store.store;
 
   const [gameFolder, setGameFolder] = useState("");
   const [modletFolder, setModletFolder] = useState("");
-  const [modlets, setModlets] = useState(new Array());
+  const [modlets, setModlets] = useState(new Array()); // eslint-disable-line @typescript-eslint/no-array-constructor
   const [advancedMode, setAdvancedMode] = useState(false);
 
   const getFolder = async (title: string) => {
@@ -41,31 +44,37 @@ const App: React.FC = () => {
     return null;
   };
 
-  const getGameFolder = async (event: React.MouseEvent | null) => {
-    if (event) event.preventDefault();
+  const getGameFolder = useCallback(
+    (event: React.MouseEvent | null) => {
+      if (event) event.preventDefault();
 
-    const newFolder = await getFolder('Please select the "7 Days to Die" game folder');
+      getFolder('Please select the "7 Days to Die" game folder').then(newFolder => {
+        if (newFolder) {
+          setGameFolder(newFolder);
+          setModlets([]);
+          props.store.set("gameFolder", newFolder);
 
-    if (newFolder) {
-      setGameFolder(newFolder);
-      setModlets([]);
-      config.set("gameFolder", newFolder);
+          if (!modletFolder) setModletFolder(path.join(newFolder, "Mods"));
+        }
+      });
+    },
+    [props.store, modletFolder]
+  );
 
-      if (!modletFolder) setModletFolder(path.join(newFolder, "Mods"));
-    }
-  };
+  const getModletFolder = useCallback(
+    (event: React.MouseEvent | null) => {
+      if (event) event.preventDefault();
 
-  const getModletFolder = async (event: React.MouseEvent | null) => {
-    if (event) event.preventDefault();
-
-    const newFolder = await getFolder('Please Select a valid "7 Days to Die" Modlet Folder');
-
-    if (newFolder) {
-      setModletFolder(newFolder);
-      setModlets([]);
-      config.set("modletFolder", newFolder);
-    }
-  };
+      getFolder('Please Select a valid "7 Days to Die" Modlet Folder').then(newFolder => {
+        if (newFolder) {
+          setModletFolder(newFolder);
+          setModlets([]);
+          props.store.set("modletFolder", newFolder);
+        }
+      });
+    },
+    [props.store]
+  );
 
   const toggleAdvancedMode = () => {
     setModlets([]);
@@ -73,13 +82,9 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    // Retrieve last-used folders from our saved config
-    const configData = config.store;
-
-    // Set the Game Directory if it's not already set
     if (!gameFolder) {
-      if (configData.gameFolder) {
-        setGameFolder(configData.gameFolder);
+      if (config.gameFolder) {
+        setGameFolder(config.gameFolder);
       } else {
         getGameFolder(null);
       }
@@ -87,8 +92,8 @@ const App: React.FC = () => {
 
     // Set the Modlet Directory if it's not already set
     if (!modletFolder) {
-      if (configData.modletFolder) {
-        setModletFolder(configData.modletFolder);
+      if (config.modletFolder) {
+        setModletFolder(config.modletFolder);
       } else {
         if (gameFolder) setModletFolder(path.join(gameFolder, "Mods"));
       }
@@ -99,7 +104,7 @@ const App: React.FC = () => {
       let newModletList = getModlets(advancedMode ? modletFolder : path.join(gameFolder, "Mods"));
       if (newModletList.length) setModlets(newModletList);
     }
-  }, [config.store, gameFolder, modletFolder, modlets, getGameFolder, advancedMode]);
+  }, [config.gameFolder, config.modletFolder, gameFolder, modletFolder, modlets, getGameFolder, advancedMode]);
 
   return (
     <ThemeProvider theme={theme}>
