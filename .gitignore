@@ -10,6 +10,7 @@
 
 # production
 /build
+/stash
 
 # misc
 .DS_Store
