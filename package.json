@@ -33,6 +33,7 @@
     "build": "rescripts build",
     "dist": "yarn build && electron-builder",
     "test": "react-scripts test",
+    "test-coverage": "react-scripts test --coverage",
     "dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
@@ -76,6 +77,8 @@
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.9.4",
     "@types/xml2js": "^0.4.5",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
     "concurrently": "^5.0.0",
     "cross-env": "^6.0.3",
     "electron-builder": "^21.2.0",
@@ -87,6 +90,7 @@
     "react-hot-loader": "^4.12.18",
     "react-test-renderer": "^16.12.0",
     "typescript": "^3.7.2",
+    "typescript-eslint-parser": "^22.0.0",
     "wait-on": "^3.3.0"
   }
 }

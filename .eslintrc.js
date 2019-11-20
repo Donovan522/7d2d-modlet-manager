@@ -2,13 +2,15 @@ module.exports = {
   /* your base configuration of choice */
   extends: ["eslint:recommended", "plugin:react/recommended"],
 
-  parser: "babel-eslint",
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     sourceType: "module"
   },
+  plugins: ["@typescript-eslint"],
   env: {
     browser: true,
-    node: true
+    node: true,
+    jest: true
   },
   globals: {
     __static: true
