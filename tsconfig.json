@@ -16,5 +16,5 @@
     "noEmit": true,
     "jsx": "react"
   },
-  "include": ["src", "src/index.js", "public/electron.js"]
+  "include": ["src", "src/index.js", "public/electron.js", "stash/mock_fs.js"]
 }

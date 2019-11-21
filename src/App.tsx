@@ -16,7 +16,6 @@ import theme from "theme";
 
 const useStyles = makeStyles(() => ({
   mainContainer: {
-    // flexGrow: 1,
     marginTop: 10
   }
 }));

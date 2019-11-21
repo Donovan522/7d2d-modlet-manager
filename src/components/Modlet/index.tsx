@@ -14,7 +14,7 @@ interface ModletProps {
 }
 
 const ModletComponent = (props: ModletProps) => {
-  const [enabled, setEnabled] = useState(props.modlet.enabled);
+  const [enabled, setEnabled] = useState(props.modlet.isEnabled());
 
   const handleEnableClick = (event: React.ChangeEvent<HTMLInputElement>, modlet: Modlet) => {
     setEnabled(event.target.checked);
@@ -40,13 +40,13 @@ const ModletComponent = (props: ModletProps) => {
   return (
     <Card>
       <CardContent>
-        <Typography variant="body1">{props.modlet.name}</Typography>
+        <Typography variant="body1">{props.modlet.get("name")}</Typography>
         <Typography variant="body2" color="textSecondary">
-          {props.modlet.description}
+          {props.modlet.get("description")}
         </Typography>
         <Typography style={{ paddingTop: 15 }} variant="caption" component="div" color="textSecondary">
-          By {props.modlet.author} - v.{props.modlet.version}&nbsp;
-          {props.modlet.compat !== "unknown" && <i>(compatible with: {props.modlet.compat})</i>}
+          By {props.modlet.get("author")} - v.{props.modlet.get("version")}&nbsp;
+          {props.modlet.get("compat") !== "unknown" && <i>(compatible with: {props.modlet.get("compat")})</i>}
         </Typography>
       </CardContent>
       <CardActions>{formControl}</CardActions>
@@ -56,7 +56,7 @@ const ModletComponent = (props: ModletProps) => {
 
 ModletComponent.prototypes = {
   advancedMode: PropTypes.bool.isRequired,
-  modlet: PropTypes.string.isRequired
+  modlet: PropTypes.instanceOf(Modlet).isRequired
 };
 
 export default ModletComponent;

@@ -3,18 +3,17 @@ import path from "path";
 import { Parser } from "xml2js";
 
 export default class Modlet {
-  author: string;
-  compat: string;
-  description: string;
-  enabled: boolean;
-  errors: string[];
-  modInfoFile: string;
-  modInfoXML: string;
-  name: string;
-  version: string;
+  private _data: { [index: string]: string };
+  private _errors: string[];
+  private _enabled: boolean;
+  modInfo: { [index in "file" | "xml" | "raw"]: string };
 
   constructor(file: string) {
     let xml: any | undefined;
+    let raw: any | undefined;
+
+    this._data = {};
+    this._errors = [];
 
     if (fs.existsSync(file)) {
       const xmlparser = new Parser({
@@ -26,65 +25,75 @@ export default class Modlet {
 
       xmlparser.parseString(fs.readFileSync(file, "utf8"), (err: Error, xmlfile: any) => {
         if (err) {
-          console.log("ERROR:", err);
-          this.name = "Not a valid modlet";
-          return;
+          console.error("ERROR:", err);
+          this._errors.push(`Error parsing XML file: ${err}`);
+          throw err;
         }
 
+        raw = xmlfile;
         xml = xmlfile.modinfo;
       });
     }
 
-    this.author = Modlet._getXMLValue(xml, "author");
-    this.compat = Modlet._getXMLValue(xml, "version", "compat");
-    this.description = Modlet._getXMLValue(xml, "description");
-    this.name = Modlet._getXMLValue(xml, "name");
-    this.version = Modlet._getXMLValue(xml, "version");
+    this._data.author = Modlet._getXMLValue(xml, "author");
+    this._data.compat = Modlet._getXMLValue(xml, "version", "compat");
+    this._data.description = Modlet._getXMLValue(xml, "description");
+    this._data.name = Modlet._getXMLValue(xml, "name");
+    this._data.version = Modlet._getXMLValue(xml, "version");
 
-    this.modInfoFile = file;
-    this.modInfoXML = xml;
+    this.modInfo = { file, xml, raw };
 
-    this.enabled = !path.basename(file).match(/disabled/i);
-
-    this.errors = [];
+    this._enabled = !path.basename(file).match(/disabled/i);
 
     this._validate();
+  }
+
+  get(key: string) {
+    return this._data[key];
   }
 
   isValid(): boolean {
     this._validate();
-    return this.errors.length === 0;
+    return this._errors.length === 0;
+  }
+
+  errors(): string[] {
+    return this._errors;
+  }
+
+  isEnabled() {
+    return this._enabled;
   }
 
   enable(enabled: boolean) {
     // disable request
-    if (!enabled && this.enabled) {
-      this._renameModInfo(path.join(path.dirname(this.modInfoFile), "disabled-ModInfo.xml"));
+    if (!enabled && this.isEnabled()) {
+      this._renameModInfo(path.join(path.dirname(this.modInfo.file), "disabled-ModInfo.xml"));
     }
 
     // enable request
-    if (enabled && !this.enabled) {
-      this._renameModInfo(path.join(path.dirname(this.modInfoFile), "ModInfo.xml"));
+    if (enabled && !this.isEnabled()) {
+      this._renameModInfo(path.join(path.dirname(this.modInfo.file), "ModInfo.xml"));
     }
 
-    this.enabled = enabled;
+    this._enabled = enabled;
   }
 
   // TODO: Validate code goes here
   // validate(gameFolder: string) {}
 
   _renameModInfo(newModInfoFile: string) {
-    fs.renameSync(this.modInfoFile, newModInfoFile);
-    this.modInfoFile = newModInfoFile;
+    fs.renameSync(this.modInfo.file, newModInfoFile);
+    this.modInfo.file = newModInfoFile;
   }
 
   private _validate(): void {
-    let errorString;
+    let errorString: string;
 
-    ["author", "description", "name", "version"].forEach(attribute => {
+    ["author", "description", "name", "version"].forEach((attribute: any) => {
       errorString = `${attribute} is unknown`;
 
-      if (this[attribute] === "unknown" && !this.errors.includes(errorString)) this.errors.push(errorString);
+      if (this.get(attribute) === "unknown" && !this._errors.includes(errorString)) this._errors.push(errorString);
     });
   }
 

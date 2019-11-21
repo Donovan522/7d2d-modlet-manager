@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import Modlet from "./modlet";
+import { Modlet } from "helpers";
 
 export default function getModlets(searchFolder: string): Modlet[] {
   let modletArray: Modlet[] = [];

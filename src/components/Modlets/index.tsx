@@ -56,7 +56,7 @@ const modletsList = (props: ModletsProps, classes: Record<"card", string>) => {
 
 const noModlets = (
   modsPath: string,
-  button: React.ReactNode | undefined,
+  button: React.ReactNode,
   classes: Record<"cardEmpty" | "noModletsHeader" | "noModletsBody", string> // eslint-disable-line no-undef
 ) => {
   return (
@@ -76,9 +76,9 @@ const noModlets = (
 const Modlets = (props: ModletsProps) => {
   let modletList: React.ReactNode[] | React.ReactNode;
   const classes = useStyles();
-  const modsPath = path.join(props.gameFolder, "Mods");
+  const modsPath = props.gameFolder ? path.join(props.gameFolder, "Mods") : "";
 
-  const [button, setButton] = useState();
+  const [button, setButton] = useState(<span />);
 
   modletList = props.modlets.length ? modletsList(props, classes) : noModlets(modsPath, button, classes);
 
@@ -86,7 +86,7 @@ const Modlets = (props: ModletsProps) => {
     const createModsFolder = () => {
       if (!fs.existsSync(modsPath)) {
         fs.mkdirSync(modsPath);
-        setButton(undefined);
+        setButton(<span />);
       }
     };
 
@@ -97,7 +97,7 @@ const Modlets = (props: ModletsProps) => {
         </Button>
       );
     }
-  }, [button, modsPath, classes.button]);
+  }, [props.gameFolder, button, modsPath, classes.button]);
 
   return (
     <Grid container spacing={2} className={classes.root}>
