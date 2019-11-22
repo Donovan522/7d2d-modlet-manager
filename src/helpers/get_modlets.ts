@@ -9,12 +9,12 @@ export default function getModlets(searchFolder: string): Modlet[] {
   if (!fs.existsSync(searchFolder)) return modletArray;
 
   fs.readdirSync(searchFolder).forEach(entry => {
-    const filename: string = path.join(searchFolder, entry);
+    const filename: string = path.posix.join(searchFolder, entry);
 
     if (fs.statSync(filename).isDirectory()) {
       fs.readdirSync(filename).some(file => {
         if (file.match(/modinfo/i)) {
-          modletArray.push(new Modlet(path.join(filename, file)));
+          modletArray.push(new Modlet(path.posix.join(filename, file)));
           return true;
         }
         return false;

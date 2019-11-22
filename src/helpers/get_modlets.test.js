@@ -30,6 +30,6 @@ afterAll(() => mock_fs.restore());
 
 it("returns an empty array when no searchFolder provided", () => expect(getModlets(null)).toEqual([]));
 
-it("returns an array", () => {
+it("returns an array of Modlet instances", () => {
   expect(getModlets("/foo/bar")).toEqual([mockModlet]);
 });

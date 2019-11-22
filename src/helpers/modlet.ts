@@ -43,7 +43,7 @@ export default class Modlet {
 
     this.modInfo = { file, xml, raw };
 
-    this._enabled = !path.basename(file).match(/disabled/i);
+    this._enabled = !path.posix.basename(file).match(/disabled/i);
 
     this._validate();
   }
@@ -68,12 +68,12 @@ export default class Modlet {
   enable(enabled: boolean) {
     // disable request
     if (!enabled && this.isEnabled()) {
-      this._renameModInfo(path.join(path.dirname(this.modInfo.file), "disabled-ModInfo.xml"));
+      this._renameModInfo(path.posix.join(path.posix.dirname(this.modInfo.file), "disabled-ModInfo.xml"));
     }
 
     // enable request
     if (enabled && !this.isEnabled()) {
-      this._renameModInfo(path.join(path.dirname(this.modInfo.file), "ModInfo.xml"));
+      this._renameModInfo(path.posix.join(path.posix.dirname(this.modInfo.file), "ModInfo.xml"));
     }
 
     this._enabled = enabled;

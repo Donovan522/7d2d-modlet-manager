@@ -103,7 +103,7 @@ const App = (props: AppProps) => {
       let newModletList = getModlets(advancedMode ? modletFolder : path.join(gameFolder, "Mods"));
       if (newModletList.length) setModlets(newModletList);
     }
-  }, [config.gameFolder, config.modletFolder, gameFolder, modletFolder, modlets, getGameFolder, advancedMode]);
+  }, [config.gameFolder, config.modletFolder, gameFolder, modletFolder, modlets, advancedMode]);
 
   return (
     <ThemeProvider theme={theme}>

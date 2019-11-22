@@ -2,6 +2,13 @@
   "name": "7d2d-modlet-manager",
   "description": "7 Days to Die Modlet Manager",
   "version": "0.1.0",
+  "repository": "https://github.com/Donovan522/7d2d-modlet-manager",
+  "homepage": "./",
+  "keywords": [
+    "7 days to die",
+    "Modlet",
+    "mod"
+  ],
   "private": true,
   "author": {
     "name": "Donovan C. Young",
@@ -24,17 +31,20 @@
         "assets",
         "public"
       ]
+    },
+    "publish": {
+      "provider": "github"
     }
   },
-  "homepage": "./",
   "main": "public/electron.js",
   "scripts": {
+    "dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
     "start": "rescripts start",
     "build": "rescripts build",
-    "dist": "yarn build && electron-builder",
+    "dist": "yarn build && electron-builder -w",
+    "release": "yarn build && electron-builder -w -p 'onTagOrDraft'",
     "test": "react-scripts test",
     "test-coverage": "react-scripts test --coverage",
-    "dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
     "electron-pack": "build -w",
