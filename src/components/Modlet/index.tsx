@@ -1,6 +1,8 @@
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Typography from "@material-ui/core/Typography";
@@ -13,7 +15,9 @@ interface ModletProps {
   modlet: Modlet;
 }
 
-const ModletComponent = (props: ModletProps) => {
+function ModletComponent(props: ModletProps): React.ReactElement {
+  const conditions: React.ReactNode[] = [];
+
   const [enabled, setEnabled] = useState(props.modlet.isEnabled());
 
   const handleEnableClick = (event: React.ChangeEvent<HTMLInputElement>, modlet: Modlet) => {
@@ -21,23 +25,34 @@ const ModletComponent = (props: ModletProps) => {
     modlet.enable(event.target.checked);
   };
 
-  let formControl: React.ReactNode;
+  const enableSwitch: React.ReactNode = (
+    <FormControlLabel
+      style={{ marginLeft: "auto", marginRight: 5 }}
+      control={<Switch size="small" checked={enabled} onChange={e => handleEnableClick(e, props.modlet)} />}
+      label={enabled ? "Enabled" : "Disabled"}
+      labelPlacement="start"
+    />
+  );
 
-  if (!props.advancedMode) {
-    // what to render in Basic mode
-    formControl = (
-      <FormControlLabel
-        style={{ marginLeft: "auto" }}
-        control={<Switch size="small" checked={enabled} onChange={e => handleEnableClick(e, props.modlet)} />}
-        label={enabled ? "Enabled" : "Disabled"}
-      />
-    );
-  } else {
-    // What to render in advancedMode
-    formControl = <span />;
-  }
+  const compatability = props.modlet.get("compat");
 
-  return (
+  return props.advancedMode ? (
+    <TableRow>
+      <TableCell>
+        <Typography variant="body1">{props.modlet.get("name")}</Typography>
+        <Typography variant="body2" color="textSecondary">
+          {props.modlet.get("description")}
+        </Typography>
+      </TableCell>
+      <TableCell align="right">
+        <Typography variant="body1">{props.modlet.get("version")}</Typography>
+        <Typography variant="body2" color="textSecondary">
+          {compatability}
+        </Typography>
+      </TableCell>
+      <TableCell>{conditions}</TableCell>
+    </TableRow>
+  ) : (
     <Card>
       <CardContent>
         <Typography variant="body1">{props.modlet.get("name")}</Typography>
@@ -49,12 +64,12 @@ const ModletComponent = (props: ModletProps) => {
           {props.modlet.get("compat") !== "unknown" && <i>(compatible with: {props.modlet.get("compat")})</i>}
         </Typography>
       </CardContent>
-      <CardActions>{formControl}</CardActions>
+      <CardActions>{enableSwitch}</CardActions>
     </Card>
   );
-};
+}
 
-ModletComponent.prototypes = {
+ModletComponent.propTypes = {
   advancedMode: PropTypes.bool.isRequired,
   modlet: PropTypes.instanceOf(Modlet).isRequired
 };

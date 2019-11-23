@@ -10,7 +10,7 @@ let mainWindow;
 
 function createWindow() {
   let state = windowStateKeeper({
-    defaultWidth: 1000,
+    defaultWidth: 1024,
     defaultHeight: 800
   });
 
@@ -20,7 +20,7 @@ function createWindow() {
     y: state.y,
     width: state.width,
     height: state.height,
-    minWidth: 1000,
+    minWidth: 1024,
     minHeight: 800,
     backgroundColor: grey[300],
     webPreferences: {

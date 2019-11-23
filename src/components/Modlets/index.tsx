@@ -1,7 +1,13 @@
 import Button from "@material-ui/core/Button";
+import Paper from "@material-ui/core/Paper";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
+import Table from "@material-ui/core/Table";
+import TableHead from "@material-ui/core/TableHead";
+import TableBody from "@material-ui/core/TableBody";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
 import Typography from "@material-ui/core/Typography";
 import Modlet from "components/Modlet";
 import fs from "fs";
@@ -10,15 +16,14 @@ import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 
 interface ModletsProps {
-  advancedMode: boolean;
-  gameFolder: string;
-  modletFolder: string;
-  modlets: string[];
+  state: any;
 }
 
-const useStyles = makeStyles(() => ({
-  root: {
-    marginTop: 20
+const useStyles = makeStyles(theme => ({
+  button: {
+    display: "block",
+    margin: "auto",
+    marginTop: 30
   },
   card: {
     width: "50%"
@@ -35,30 +40,55 @@ const useStyles = makeStyles(() => ({
   noModletsBody: {
     paddingTop: 10
   },
-  button: {
-    display: "block",
-    margin: "auto",
-    marginTop: 30
+  paper: {
+    width: "100%",
+    margin: theme.spacing(1)
+  },
+  root: {
+    marginTop: 20
   }
 }));
 
 // apparently "Record" isn't seen by eslint as a part of TypeScript
 // eslint-disable-next-line no-undef
-const modletsList = (props: ModletsProps, classes: Record<"card", string>) => {
-  return props.modlets.map((modletObj: any, index: number) => {
+function modletsListBasic(props: ModletsProps, classes: Record<"card", string>): React.ReactNode {
+  return props.state.modlets.map((modletObj: any, index: number) => {
     return (
       <Grid item key={index} className={classes.card}>
-        <Modlet modlet={modletObj} advancedMode={props.advancedMode} />
+        <Modlet modlet={modletObj} advancedMode={props.state.advancedMode} />
       </Grid>
     );
   });
-};
+}
 
-const noModlets = (
+// apparently "Record" isn't seen by eslint as a part of TypeScript
+// eslint-disable-next-line no-undef
+function modletsListAdvanced(props: ModletsProps, classes: Record<"paper", string>): React.ReactNode {
+  return (
+    <Paper className={classes.paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name &amp; Description</TableCell>
+            <TableCell>Version</TableCell>
+            <TableCell>Status</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {props.state.modlets.map((modletObj: any, index: number) => (
+            <Modlet key={index} modlet={modletObj} advancedMode={props.state.advancedMode} />
+          ))}
+        </TableBody>
+      </Table>
+    </Paper>
+  );
+}
+
+function noModlets(
   modsPath: string,
   button: React.ReactNode,
   classes: Record<"cardEmpty" | "noModletsHeader" | "noModletsBody", string> // eslint-disable-line no-undef
-) => {
+): React.ReactNode {
   return (
     <Grid item key="no-modlets" className={classes.cardEmpty}>
       <Typography variant="h6" className={classes.noModletsHeader}>
@@ -71,16 +101,19 @@ const noModlets = (
       </Typography>
     </Grid>
   );
-};
+}
 
-const Modlets = (props: ModletsProps) => {
+function Modlets(props: ModletsProps): React.ReactElement {
   let modletList: React.ReactNode[] | React.ReactNode;
-  const classes = useStyles();
-  const modsPath = props.gameFolder ? path.join(props.gameFolder, "Mods") : "";
-
   const [button, setButton] = useState(<span />);
+  const classes = useStyles();
+  const modsPath = props.state.config.gameFolder ? path.join(props.state.config.gameFolder, "Mods") : "";
 
-  modletList = props.modlets.length ? modletsList(props, classes) : noModlets(modsPath, button, classes);
+  modletList = props.state.modlets.length
+    ? props.state.advancedMode
+      ? modletsListAdvanced(props, classes)
+      : modletsListBasic(props, classes)
+    : noModlets(modsPath, button, classes);
 
   useEffect(() => {
     const createModsFolder = () => {
@@ -97,20 +130,17 @@ const Modlets = (props: ModletsProps) => {
         </Button>
       );
     }
-  }, [props.gameFolder, button, modsPath, classes.button]);
+  }, [props.state.config.gameFolder, button, modsPath, classes.button]);
 
   return (
     <Grid container spacing={2} className={classes.root}>
       {modletList}
     </Grid>
   );
-};
+}
 
-Modlets.prototypes = {
-  advancedMode: PropTypes.bool.isRequired,
-  gameFolder: PropTypes.string.isRequired,
-  modletFolder: PropTypes.string.isRequired,
-  modlets: PropTypes.arrayOf(PropTypes.string).isRequired
+Modlets.propTypes = {
+  state: PropTypes.object.isRequired
 };
 
 export default Modlets;

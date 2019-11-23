@@ -11,7 +11,8 @@ import { shell } from "electron";
 import PropTypes from "prop-types";
 import React from "react";
 
-interface Props {
+interface IFolderPickerProps {
+  advancedMode: boolean;
   folder: string;
   handleClick: (event: React.MouseEvent | null) => void;
   label: string;
@@ -27,7 +28,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const FolderPicker: React.FC<Props> = props => {
+function FolderPicker(props: IFolderPickerProps): React.ReactElement {
   const classes = useStyles();
 
   const handleFolderExternalClick = (event: React.MouseEvent) => {
@@ -36,33 +37,34 @@ const FolderPicker: React.FC<Props> = props => {
   };
 
   return (
-    <>
-      <Tooltip
-        title={props.tooltip}
-        color="secondary"
-        placement="top-start"
-        enterDelay={500}
-        leaveDelay={200}
-        TransitionComponent={Fade}
-        TransitionProps={{ timeout: 600 }}
-      >
-        <ListItem className={classes.listItem} onClick={props.handleClick}>
-          <ListItemIcon>
-            <FolderIcon color="secondary" />
-          </ListItemIcon>
-          <ListItemText primary={props.label} secondary={props.folder} />
+    <Tooltip
+      title={props.tooltip}
+      color="secondary"
+      placement="top-start"
+      enterDelay={500}
+      leaveDelay={200}
+      TransitionComponent={Fade}
+      TransitionProps={{ timeout: 600 }}
+    >
+      <ListItem className={classes.listItem} onClick={props.handleClick}>
+        <ListItemIcon>
+          <FolderIcon color="secondary" />
+        </ListItemIcon>
+        <ListItemText primary={props.label} secondary={props.folder} />
+        {props.advancedMode && (
           <ListItemIcon style={{ marginLeft: "auto" }}>
             <IconButton size="small" aria-label="open-folder" onClick={handleFolderExternalClick}>
               <MoreHorizIcon />
             </IconButton>
           </ListItemIcon>
-        </ListItem>
-      </Tooltip>
-    </>
+        )}
+      </ListItem>
+    </Tooltip>
   );
-};
+}
 
 FolderPicker.propTypes = {
+  advancedMode: PropTypes.bool.isRequired,
   folder: PropTypes.string.isRequired,
   handleClick: PropTypes.func.isRequired,
   label: PropTypes.string.isRequired,
