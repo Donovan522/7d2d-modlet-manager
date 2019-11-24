@@ -25,9 +25,7 @@ const useStyles = makeStyles(theme => ({
     margin: "auto",
     marginTop: 30
   },
-  card: {
-    width: "50%"
-  },
+  card: {},
   cardEmpty: {
     flex: "1 1 auto",
     color: "silver",
@@ -75,6 +73,7 @@ function modletsListAdvanced(props: ModletsProps, classes: Record<"paper" | "tab
         <TableHead>
           <TableRow>
             <TableCell className={classes.tableHeader}>Name / Description</TableCell>
+            <TableCell className={classes.tableHeader}>Author</TableCell>
             <TableCell className={classes.tableHeader} align="right">
               Version
             </TableCell>

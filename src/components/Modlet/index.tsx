@@ -9,67 +9,92 @@ import Typography from "@material-ui/core/Typography";
 import { Modlet } from "helpers";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
+import { makeStyles } from "@material-ui/core/styles";
 
 interface ModletProps {
   advancedMode: boolean;
   modlet: Modlet;
 }
 
-function ModletComponent(props: ModletProps): React.ReactElement {
-  const conditions: React.ReactNode[] = [];
+const useStyles = makeStyles(theme => ({
+  root: {
+    height: "auto"
+  },
+  cardVersion: {
+    fontStyle: "italic",
+    marginRight: "auto",
+    paddingLeft: theme.spacing(1)
+  },
+  enableControl: {
+    marginLeft: "auto",
+    paddingRight: theme.spacing(1)
+  },
+  italic: {
+    fontStyle: "italic"
+  },
+  description: {
+    paddingTop: theme.spacing(1)
+  }
+}));
 
+function ModletComponent(props: ModletProps): React.ReactElement {
   const [enabled, setEnabled] = useState(props.modlet.isEnabled());
+
+  const classes = useStyles();
+  const conditions: React.ReactNode[] = [];
 
   const handleEnableClick = (event: React.ChangeEvent<HTMLInputElement>, modlet: Modlet) => {
     setEnabled(event.target.checked);
     modlet.enable(event.target.checked);
   };
 
-  const enableSwitch: React.ReactNode = (
-    <FormControlLabel
-      style={{ marginLeft: "auto", marginRight: 5 }}
-      control={<Switch size="small" checked={enabled} onChange={e => handleEnableClick(e, props.modlet)} />}
-      label={enabled ? "Enabled" : "Disabled"}
-      labelPlacement="start"
-    />
-  );
-
-  const compatibility = props.modlet.get("compat");
+  const modlet = {
+    name: props.modlet.get("name"),
+    author: props.modlet.get("author"),
+    description: props.modlet.get("description"),
+    version: props.modlet.get("version"),
+    compatibility: props.modlet.get("compat")
+  };
 
   return props.advancedMode ? (
     <TableRow>
       <TableCell>
-        <Typography variant="body1">{props.modlet.get("name")}</Typography>
-        <Typography variant="body2" color="textSecondary">
-          {props.modlet.get("description")}
+        <Typography>{modlet.name}</Typography>
+        <Typography className={classes.description} variant="body2" color="textSecondary">
+          {modlet.description}
         </Typography>
       </TableCell>
+      <TableCell>
+        <Typography>{modlet.author}</Typography>
+      </TableCell>
       <TableCell align="right">
-        <Typography variant="body1">{props.modlet.get("version")}</Typography>
-        <Typography style={{ fontStyle: "italic" }} variant="body2" color="textSecondary">
-          {compatibility}
+        <Typography>{modlet.version}</Typography>
+        <Typography className={classes.italic} variant="body2" color="textSecondary">
+          {modlet.compatibility}
         </Typography>
       </TableCell>
       <TableCell>{conditions}</TableCell>
     </TableRow>
   ) : (
-    <Card>
+    <Card className={classes.root}>
       <CardContent>
-        <Typography variant="body1">{props.modlet.get("name")}</Typography>
-        <Typography variant="body2" color="textSecondary">
-          {props.modlet.get("description")}
-        </Typography>
-        <Typography
-          style={{ paddingTop: 15, fontStyle: "italic" }}
-          variant="caption"
-          component="div"
-          color="textSecondary"
-        >
-          By {props.modlet.get("author")} - v{props.modlet.get("version")}&nbsp;
-          {props.modlet.get("compat") !== "unknown" && <i>(compatibility: {compatibility})</i>}
+        <Typography>{modlet.name}</Typography>
+        <Typography className={classes.description} variant="body2" color="textSecondary">
+          {modlet.description}
         </Typography>
       </CardContent>
-      <CardActions>{enableSwitch}</CardActions>
+      <CardActions>
+        <Typography className={classes.cardVersion} variant="caption" component="div" color="textSecondary">
+          By {modlet.author} - v{modlet.version}{" "}
+          {modlet.compatibility !== "unknown" && <i> (compatibility: {modlet.compatibility})</i>}
+        </Typography>
+        <FormControlLabel
+          className={classes.enableControl}
+          control={<Switch size="small" checked={enabled} onChange={e => handleEnableClick(e, props.modlet)} />}
+          label={enabled ? "Enabled" : "Disabled"}
+          labelPlacement="start"
+        />
+      </CardActions>
     </Card>
   );
 }

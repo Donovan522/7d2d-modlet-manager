@@ -1,3 +1,4 @@
+import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Collapse from "@material-ui/core/Collapse";
@@ -16,9 +17,19 @@ import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { hot } from "react-hot-loader";
 import theme from "helpers/theme";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   mainContainer: {
-    marginTop: 10
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh"
+  },
+  bodyContainer: {
+    marginTop: 10,
+    overflowY: "auto",
+    height: "100%"
+  },
+  modeControl: {
+    padding: theme.spacing(1)
   },
   noGameFolder: {
     display: "block",
@@ -176,32 +187,34 @@ function App(props: AppProps): React.ReactElement {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="xl" className={classes.mainContainer}>
-        <FormControlLabel
-          style={{ marginLeft: "auto" }}
-          control={<Switch size="small" checked={state.advancedMode} onChange={toggleAdvancedMode} />}
-          label={state.advancedMode ? "Advanced Mode" : "Basic Mode"}
-        />
-        <List dense={true}>
-          <FolderPicker
-            advancedMode={state.advancedMode}
-            folder={state.config.gameFolder}
-            handleClick={getGameFolder}
-            label="Game Folder"
-            tooltip="Click to select Game Folder"
+      <Box className={classes.mainContainer}>
+        <Container maxWidth="xl" className={classes.bodyContainer}>
+          <FormControlLabel
+            className={classes.modeControl}
+            control={<Switch size="small" checked={state.advancedMode} onChange={toggleAdvancedMode} />}
+            label={state.advancedMode ? "Advanced Mode" : "Basic Mode"}
           />
-          <Collapse in={state.advancedMode}>
+          <List dense={true}>
             <FolderPicker
               advancedMode={state.advancedMode}
-              folder={state.config.modletFolder}
-              handleClick={getModletFolder}
-              label="Modlet Folder"
-              tooltip="Click to select Modlet folder"
+              folder={state.config.gameFolder}
+              handleClick={getGameFolder}
+              label="Game Folder"
+              tooltip="Click to select Game Folder"
             />
-          </Collapse>
-        </List>
-        <Modlets state={state} />
-      </Container>
+            <Collapse in={state.advancedMode}>
+              <FolderPicker
+                advancedMode={state.advancedMode}
+                folder={state.config.modletFolder}
+                handleClick={getModletFolder}
+                label="Modlet Folder"
+                tooltip="Click to select Modlet folder"
+              />
+            </Collapse>
+          </List>
+          <Modlets state={state} />
+        </Container>
+      </Box>
     </ThemeProvider>
   );
 }
