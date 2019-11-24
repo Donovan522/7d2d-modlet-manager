@@ -13,5 +13,9 @@ export default createMuiTheme({
     background: {
       default: grey[200]
     }
+  },
+  typography: {
+    // htmlFontSize: 16,
+    fontSize: 12
   }
 });

@@ -48,7 +48,7 @@ function FolderPicker(props: IFolderPickerProps): React.ReactElement {
     >
       <ListItem className={classes.listItem} onClick={props.handleClick}>
         <ListItemIcon>
-          <FolderIcon color="secondary" />
+          <FolderIcon />
         </ListItemIcon>
         <ListItemText primary={props.label} secondary={props.folder} />
         {props.advancedMode && (

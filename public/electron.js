@@ -11,7 +11,7 @@ let mainWindow;
 function createWindow() {
   let state = windowStateKeeper({
     defaultWidth: 1024,
-    defaultHeight: 800
+    defaultHeight: 768
   });
 
   mainWindow = new BrowserWindow({
@@ -20,9 +20,10 @@ function createWindow() {
     y: state.y,
     width: state.width,
     height: state.height,
-    minWidth: 1024,
-    minHeight: 800,
+    minWidth: 640,
+    minHeight: 480,
     backgroundColor: grey[300],
+    useContentSize: false,
     webPreferences: {
       nodeIntegration: true
     }

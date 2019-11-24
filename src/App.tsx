@@ -14,7 +14,7 @@ import { getModlets } from "helpers";
 import path from "path";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { hot } from "react-hot-loader";
-import theme from "theme";
+import theme from "helpers/theme";
 
 const useStyles = makeStyles(() => ({
   mainContainer: {
@@ -176,7 +176,7 @@ function App(props: AppProps): React.ReactElement {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container fixed className={classes.mainContainer}>
+      <Container maxWidth="xl" className={classes.mainContainer}>
         <FormControlLabel
           style={{ marginLeft: "auto" }}
           control={<Switch size="small" checked={state.advancedMode} onChange={toggleAdvancedMode} />}

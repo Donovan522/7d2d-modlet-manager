@@ -46,6 +46,11 @@ const useStyles = makeStyles(theme => ({
   },
   root: {
     marginTop: 20
+  },
+  tableHeader: {
+    fontSize: 14,
+    fontWeight: "bold"
+    // textTransform: "uppercase"
   }
 }));
 
@@ -54,7 +59,7 @@ const useStyles = makeStyles(theme => ({
 function modletsListBasic(props: ModletsProps, classes: Record<"card", string>): React.ReactNode {
   return props.state.modlets.map((modletObj: any, index: number) => {
     return (
-      <Grid item key={index} className={classes.card}>
+      <Grid item xs={12} md={6} lg={4} xl={3} key={index} className={classes.card}>
         <Modlet modlet={modletObj} advancedMode={props.state.advancedMode} />
       </Grid>
     );
@@ -63,15 +68,19 @@ function modletsListBasic(props: ModletsProps, classes: Record<"card", string>):
 
 // apparently "Record" isn't seen by eslint as a part of TypeScript
 // eslint-disable-next-line no-undef
-function modletsListAdvanced(props: ModletsProps, classes: Record<"paper", string>): React.ReactNode {
+function modletsListAdvanced(props: ModletsProps, classes: Record<"paper" | "tableHeader", string>): React.ReactNode {
   return (
     <Paper className={classes.paper}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Name &amp; Description</TableCell>
-            <TableCell>Version</TableCell>
-            <TableCell>Status</TableCell>
+            <TableCell className={classes.tableHeader}>Name / Description</TableCell>
+            <TableCell className={classes.tableHeader} align="right">
+              Version
+            </TableCell>
+            <TableCell className={classes.tableHeader} align="center">
+              Status
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

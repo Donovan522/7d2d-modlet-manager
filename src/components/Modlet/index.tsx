@@ -34,7 +34,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
     />
   );
 
-  const compatability = props.modlet.get("compat");
+  const compatibility = props.modlet.get("compat");
 
   return props.advancedMode ? (
     <TableRow>
@@ -46,8 +46,8 @@ function ModletComponent(props: ModletProps): React.ReactElement {
       </TableCell>
       <TableCell align="right">
         <Typography variant="body1">{props.modlet.get("version")}</Typography>
-        <Typography variant="body2" color="textSecondary">
-          {compatability}
+        <Typography style={{ fontStyle: "italic" }} variant="body2" color="textSecondary">
+          {compatibility}
         </Typography>
       </TableCell>
       <TableCell>{conditions}</TableCell>
@@ -59,9 +59,14 @@ function ModletComponent(props: ModletProps): React.ReactElement {
         <Typography variant="body2" color="textSecondary">
           {props.modlet.get("description")}
         </Typography>
-        <Typography style={{ paddingTop: 15 }} variant="caption" component="div" color="textSecondary">
-          By {props.modlet.get("author")} - v.{props.modlet.get("version")}&nbsp;
-          {props.modlet.get("compat") !== "unknown" && <i>(compatible with: {props.modlet.get("compat")})</i>}
+        <Typography
+          style={{ paddingTop: 15, fontStyle: "italic" }}
+          variant="caption"
+          component="div"
+          color="textSecondary"
+        >
+          By {props.modlet.get("author")} - v{props.modlet.get("version")}&nbsp;
+          {props.modlet.get("compat") !== "unknown" && <i>(compatibility: {compatibility})</i>}
         </Typography>
       </CardContent>
       <CardActions>{enableSwitch}</CardActions>
