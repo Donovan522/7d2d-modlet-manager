@@ -58,7 +58,7 @@ function modletsListBasic(props: ModletsProps, classes: Record<"card", string>):
   return props.state.modlets.map((modletObj: any, index: number) => {
     return (
       <Grid item xs={12} md={6} lg={4} xl={3} key={index} className={classes.card}>
-        <Modlet modlet={modletObj} advancedMode={props.state.advancedMode} />
+        <Modlet modlet={modletObj} state={props.state} />
       </Grid>
     );
   });
@@ -84,7 +84,7 @@ function modletsListAdvanced(props: ModletsProps, classes: Record<"paper" | "tab
         </TableHead>
         <TableBody>
           {props.state.modlets.map((modletObj: any, index: number) => (
-            <Modlet key={index} modlet={modletObj} advancedMode={props.state.advancedMode} />
+            <Modlet key={index} modlet={modletObj} state={props.state} />
           ))}
         </TableBody>
       </Table>

@@ -1,12 +1,12 @@
 import getModlets from "./get_modlets";
-import Modlet from "helpers/Modlet";
+import Modlet from "helpers/modlet-class";
 import mock_fs from "mock-fs";
 import createMockModlet from "test_helpers/mock_modlet";
 
 const mockModlet = createMockModlet();
 
-jest.genMockFromModule("helpers/Modlet");
-jest.mock("helpers/Modlet");
+jest.genMockFromModule("helpers/modlet-class");
+jest.mock("helpers/modlet-class");
 
 Modlet.mockImplementation(() => mockModlet);
 

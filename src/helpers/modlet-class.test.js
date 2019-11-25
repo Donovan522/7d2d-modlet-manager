@@ -47,3 +47,7 @@ it("should be disabled when modinfo is prefixed with 'disabled'", () => {
   expect(modlet.modInfo.file).toEqual(modinfoPath);
   expect(modlet.isEnabled()).toBe(false);
 });
+
+it("should return the modlet directory name", () => {
+  expect(modlet.modInfo.folder).toEqual("baz");
+});

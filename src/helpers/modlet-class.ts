@@ -6,11 +6,12 @@ export default class Modlet {
   private _data: { [index: string]: string };
   private _errors: string[];
   private _enabled: boolean;
-  modInfo: { [index in "file" | "xml" | "raw"]: string };
+  modInfo: { [index in "file" | "folder" | "xml" | "raw"]: string };
 
   constructor(file: string) {
     let xml: any | undefined;
     let raw: any | undefined;
+    const folder = path.basename(path.dirname(file));
 
     this._data = {};
     this._errors = [];
@@ -41,7 +42,7 @@ export default class Modlet {
     this._data.name = Modlet._getXMLValue(xml, "name");
     this._data.version = Modlet._getXMLValue(xml, "version");
 
-    this.modInfo = { file, xml, raw };
+    this.modInfo = { file, folder, xml, raw };
 
     this._enabled = !path.posix.basename(file).match(/disabled/i);
 
@@ -61,11 +62,11 @@ export default class Modlet {
     return this._errors;
   }
 
-  isEnabled() {
+  isEnabled(): boolean {
     return this._enabled;
   }
 
-  enable(enabled: boolean) {
+  enable(enabled: boolean): void {
     // disable request
     if (!enabled && this.isEnabled()) {
       this._renameModInfo(path.posix.join(path.posix.dirname(this.modInfo.file), "disabled-ModInfo.xml"));
@@ -77,6 +78,20 @@ export default class Modlet {
     }
 
     this._enabled = enabled;
+  }
+
+  install(installTo: string) {
+    const installFrom = path.dirname(this.modInfo.file);
+
+    if (!installTo) {
+      throw new Error("Must provide the destination to install");
+    }
+
+    if (installFrom === installTo || fs.existsSync(installTo)) {
+      throw new Error(`Error: ${installTo} is already installed`);
+    }
+
+    return fs.promises.symlink(installFrom, installTo, "junction");
   }
 
   // TODO: Validate code goes here
