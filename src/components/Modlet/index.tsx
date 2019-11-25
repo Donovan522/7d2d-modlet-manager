@@ -14,8 +14,7 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import RadioButtonUncheckedIcon from "@material-ui/icons/RadioButtonUnchecked";
 import { remote } from "electron";
-import fs from "fs";
-import { Modlet } from "helpers";
+import { fileExists, Modlet } from "helpers";
 import path from "path";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
@@ -74,7 +73,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
   const checkedNuetral: React.ReactNode = <RadioButtonUncheckedIcon />;
 
   const [enabled, setEnabled] = useState(modlet.isEnabled());
-  const [installed, setInstalled] = useState(fs.existsSync(modInstallPath));
+  const [installed, setInstalled] = useState(fileExists(modInstallPath));
 
   const conditions: React.ReactNode[] = [
     <FormControlLabel

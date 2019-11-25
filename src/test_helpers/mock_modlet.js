@@ -19,10 +19,15 @@ function mkModInfo(type) {
 }
 
 function createMockModlet(type, path) {
-  fs.existsSync = jest.fn(fs.existsSync).mockReturnValue(true);
+  fs.access = jest.fn(fs.access).mockReturnValue(true);
   fs.readFileSync = jest.fn(fs.readFileSync).mockReturnValue(mkModInfo(type));
 
-  return new Modlet(path || "/foo/bar/baz/ModInfo.xml");
+  const modlet = new Modlet(path || "/foo/bar/bat/ModInfo.xml");
+
+  fs.access.mockRestore();
+  fs.readFileSync.mockRestore();
+
+  return modlet;
 }
 
 export default createMockModlet;

@@ -1,8 +1,29 @@
 import { Modlet } from "helpers";
 import createMockModlet from "test_helpers/mock_modlet";
+import fs from "fs";
+import mock_fs from "mock-fs";
 
 let modlet;
-const modInfoPath = "/foo/bar/baz/ModInfo.xml";
+const modInfoPath = "/foo/bar/bat/ModInfo.xml";
+
+beforeAll(() => {
+  mock_fs({
+    "/foo/bar/bat": {
+      "ModInfo.xml": `<?xml version="1.0" encoding="UTF-8" ?>
+<xml>
+  <ModInfo>
+    <Name value="test name" />
+    <Description value="test description" />
+    <Author value="test author" />
+    <Version value="Test 0.0.1" compat="N/A" />
+  </ModInfo>
+</xml>`
+    },
+    "/bif/baz": {}
+  });
+});
+
+afterAll(() => mock_fs.restore());
 
 beforeEach(() => {
   modlet = createMockModlet();
@@ -41,7 +62,7 @@ it("should be enabled by default", () => {
 });
 
 it("should be disabled when modinfo is prefixed with 'disabled'", () => {
-  const modinfoPath = "/foo/bar/baz/disabled-modinfo.xml";
+  const modinfoPath = "/foo/bar/bat/disabled-modinfo.xml";
   const modlet = new Modlet(modinfoPath);
 
   expect(modlet.modInfo.file).toEqual(modinfoPath);
@@ -49,5 +70,19 @@ it("should be disabled when modinfo is prefixed with 'disabled'", () => {
 });
 
 it("should return the modlet directory name", () => {
-  expect(modlet.modInfo.folder).toEqual("baz");
+  expect(modlet.modInfo.folder).toEqual("bat");
+});
+
+describe("Installing and Uninstalling Modlets", () => {
+  it("Should thow an error when given the same directory to install into", () => {
+    expect(() => modlet.install("/foo/bar/bat").toThrow(Error));
+  });
+
+  it("should install into a provided directory via junction", () => {
+    expect(() => fs.accessSync("/bif/baz/bat")).toThrow(fs.Error);
+    return modlet.install("/bif/baz/bat").then(() => {
+      expect(() => fs.accessSync("/bif/baz/bat")).not.toThrow(fs.Error);
+      expect(fs.statSync("/bif/baz/bat").isDirectory()).toBe(true);
+    });
+  });
 });

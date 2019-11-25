@@ -1,4 +1,5 @@
 import fs from "fs";
+import { fileExists } from "helpers";
 import path from "path";
 import { Parser } from "xml2js";
 
@@ -16,7 +17,7 @@ export default class Modlet {
     this._data = {};
     this._errors = [];
 
-    if (fs.existsSync(file)) {
+    if (fileExists(file)) {
       const xmlparser = new Parser({
         trim: true,
         normalizeTags: true,
@@ -87,7 +88,7 @@ export default class Modlet {
       throw new Error("Must provide the destination to install");
     }
 
-    if (installFrom === installTo || fs.existsSync(installTo)) {
+    if (installFrom === installTo || fileExists(installTo)) {
       throw new Error(`Error: ${installTo} is already installed`);
     }
 

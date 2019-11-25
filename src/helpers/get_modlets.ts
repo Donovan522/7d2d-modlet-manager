@@ -1,12 +1,12 @@
 import fs from "fs";
+import { fileExists, Modlet } from "helpers";
 import path from "path";
-import { Modlet } from "helpers";
 
 export default function getModlets(searchFolder: string): Modlet[] {
   let modletArray: Modlet[] = [];
 
   if (!searchFolder) return modletArray;
-  if (!fs.existsSync(searchFolder)) return modletArray;
+  if (!fileExists(searchFolder)) return modletArray;
 
   fs.readdirSync(searchFolder).forEach(entry => {
     const filename: string = path.posix.join(searchFolder, entry);

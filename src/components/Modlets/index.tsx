@@ -1,16 +1,17 @@
 import Button from "@material-ui/core/Button";
-import Paper from "@material-ui/core/Paper";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
+import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
-import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
-import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
 import Typography from "@material-ui/core/Typography";
 import Modlet from "components/Modlet";
 import fs from "fs";
+import { fileExists } from "helpers";
 import path from "path";
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
@@ -125,13 +126,13 @@ function Modlets(props: ModletsProps): React.ReactElement {
 
   useEffect(() => {
     const createModsFolder = () => {
-      if (!fs.existsSync(modsPath)) {
+      if (!fileExists(modsPath)) {
         fs.mkdirSync(modsPath);
         setButton(<span />);
       }
     };
 
-    if (!button && !fs.existsSync(modsPath)) {
+    if (!button && !fileExists(modsPath)) {
       setButton(
         <Button className={classes.button} onClick={createModsFolder}>
           Create Mods Folder?
