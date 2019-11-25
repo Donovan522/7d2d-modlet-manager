@@ -18,6 +18,7 @@ import { fileExists, Modlet } from "helpers";
 import path from "path";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
+import fs from "fs";
 
 interface ModletProps {
   state: any;
@@ -121,21 +122,43 @@ function ModletComponent(props: ModletProps): React.ReactElement {
 
   const handleInstallClick = (event: React.ChangeEvent<HTMLInputElement>, modlet: Modlet) => {
     if (!installed) {
-      modlet
-        .install(modInstallPath)
-        .then(() => {
-          setInstalled(true);
-        })
-        .catch(err => {
-          setInstalled(false);
-          remote.dialog.showErrorBox("Unable to install modlet", err);
+      setInstalled(true);
+
+      try {
+        modlet
+          .install(modInstallPath)
+          .then(() => {
+            setInstalled(true);
+          })
+          .catch(err => {
+            remote.dialog.showMessageBox({
+              type: "error",
+              title: "Unable to install modlet",
+              message: err.message
+            });
+          });
+      } catch (err) {
+        setInstalled(false);
+        remote.dialog.showMessageBox({
+          type: "error",
+          title: "Unable to install modlet",
+          message: err.message
         });
+      }
     } else {
-      remote.dialog.showMessageBox({
-        type: "info",
-        buttons: ["Ok"],
-        message: "Sorry! The uninstall feature has not been implemented yet."
-      });
+      if (fileExists(modInstallPath) && fs.statSync(modInstallPath).isDirectory()) {
+        try {
+          fs.unlinkSync(modInstallPath);
+        } catch (err) {
+          remote.dialog.showMessageBox({
+            type: "error",
+            title: "Unable to uninstall modlet",
+            message: err.message
+          });
+        } finally {
+          setInstalled(false);
+        }
+      }
     }
   };
 
