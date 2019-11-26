@@ -73,6 +73,7 @@ it("should return the modlet directory name", () => {
   expect(modlet.modInfo.folder).toEqual("bat");
 });
 
+/*
 describe("Installing and Uninstalling Modlets", () => {
   it("Should thow an error when given the same directory to install into", () => {
     expect(() => modlet.install("/foo/bar/bat").toThrow(Error));
@@ -86,3 +87,4 @@ describe("Installing and Uninstalling Modlets", () => {
     });
   });
 });
+*/

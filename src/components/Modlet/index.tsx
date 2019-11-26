@@ -14,11 +14,11 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import RadioButtonUncheckedIcon from "@material-ui/icons/RadioButtonUnchecked";
 import { remote } from "electron";
+import fs from "fs";
 import { fileExists, Modlet } from "helpers";
 import path from "path";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
-import fs from "fs";
 
 interface ModletProps {
   state: any;
@@ -65,7 +65,10 @@ const useStyles = makeStyles(theme => ({
 function ModletComponent(props: ModletProps): React.ReactElement {
   const { modlet, state } = props;
 
-  const modInstallPath = path.join(state.config.gameFolder, "Mods", modlet.modInfo.folder);
+  const modletDir = path.win32.normalize(path.dirname(modlet.modInfo.file));
+  const modletInstallPath = path.win32.normalize(path.join(state.config.gameFolder, "Mods", path.basename(modletDir)));
+  const modletLocal = modletDir === modletInstallPath;
+
   const classes = useStyles();
   const valid = modlet.isValid();
 
@@ -74,23 +77,29 @@ function ModletComponent(props: ModletProps): React.ReactElement {
   const checkedNuetral: React.ReactNode = <RadioButtonUncheckedIcon />;
 
   const [enabled, setEnabled] = useState(modlet.isEnabled());
-  const [installed, setInstalled] = useState(fileExists(modInstallPath));
+  const [installed, setInstalled] = useState(fileExists(modletInstallPath));
 
-  const conditions: React.ReactNode[] = [
-    <FormControlLabel
-      key="status-installed"
-      control={
-        <Checkbox
-          disableRipple
-          icon={checkedNuetral}
-          checkedIcon={checkedOK}
-          checked={installed}
-          onChange={e => handleInstallClick(e, modlet)}
-          className={classes.checkbox}
-        />
-      }
-      label="Installed"
-    />,
+  const conditions: React.ReactNode[] = [];
+  if (!modletLocal)
+    conditions.push(
+      <FormControlLabel
+        key="status-installed"
+        control={
+          <Checkbox
+            disableRipple
+            disabled={modletDir === modletInstallPath}
+            icon={checkedNuetral}
+            checkedIcon={checkedOK}
+            checked={installed}
+            onChange={e => handleInstallClick(e)}
+            className={classes.checkbox}
+          />
+        }
+        label="Installed"
+      />
+    );
+
+  conditions.push(
     <FormControlLabel
       key="status-enabled"
       control={
@@ -99,7 +108,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
           icon={checkedNuetral}
           checkedIcon={checkedOK}
           checked={enabled}
-          onChange={e => handleEnableClick(e, modlet)}
+          onChange={e => handleEnableClick(e)}
           className={classes.checkbox}
         />
       }
@@ -118,51 +127,48 @@ function ModletComponent(props: ModletProps): React.ReactElement {
       }
       label="Validated"
     />
-  ];
+  );
 
-  const handleInstallClick = (event: React.ChangeEvent<HTMLInputElement>, modlet: Modlet) => {
-    if (!installed) {
-      setInstalled(true);
+  const errorDialog = (title: string, err: Error) => {
+    remote.dialog.showMessageBox({
+      type: "error",
+      title: title,
+      message: err.message
+    });
+  };
 
+  const handleInstallClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (installed) {
+      setInstalled(false);
       try {
-        modlet
-          .install(modInstallPath)
-          .then(() => {
-            setInstalled(true);
-          })
-          .catch(err => {
-            remote.dialog.showMessageBox({
-              type: "error",
-              title: "Unable to install modlet",
-              message: err.message
-            });
-          });
+        if (modletLocal) throw new Error(`Error: Will not remove original modlet ${modletInstallPath}`);
+
+        if (!fileExists(modletInstallPath) || !fs.statSync(modletInstallPath).isDirectory())
+          throw new Error(`Error: ${modlet.modInfo.folder} is not installed`);
+
+        fs.unlinkSync(modletInstallPath);
       } catch (err) {
-        setInstalled(false);
-        remote.dialog.showMessageBox({
-          type: "error",
-          title: "Unable to install modlet",
-          message: err.message
-        });
+        setInstalled(true);
+        errorDialog("Unable to uninstall modlet", err);
       }
     } else {
-      if (fileExists(modInstallPath) && fs.statSync(modInstallPath).isDirectory()) {
-        try {
-          fs.unlinkSync(modInstallPath);
-        } catch (err) {
-          remote.dialog.showMessageBox({
-            type: "error",
-            title: "Unable to uninstall modlet",
-            message: err.message
-          });
-        } finally {
-          setInstalled(false);
-        }
+      setInstalled(true);
+      try {
+        if (modletLocal || fileExists(modletInstallPath))
+          throw new Error(`Error: ${modletInstallPath} is already installed`);
+
+        fs.promises
+          .symlink(modletDir, modletInstallPath, "junction")
+          .then(() => setInstalled(true))
+          .catch(err => errorDialog("Unable to install modlet", err));
+      } catch (err) {
+        setInstalled(false);
+        errorDialog("Unable to install modlet", err);
       }
     }
   };
 
-  const handleEnableClick = (event: React.ChangeEvent<HTMLInputElement>, modlet: Modlet) => {
+  const handleEnableClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEnabled(event.target.checked);
     modlet.enable(event.target.checked);
   };
@@ -211,7 +217,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
         </Typography>
         <FormControlLabel
           className={classes.enableControl}
-          control={<Switch size="small" checked={enabled} onChange={e => handleEnableClick(e, modlet)} />}
+          control={<Switch size="small" checked={enabled} onChange={e => handleEnableClick(e)} />}
           label={enabled ? "Enabled" : "Disabled"}
           labelPlacement="start"
         />

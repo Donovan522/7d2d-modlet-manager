@@ -12,7 +12,7 @@ export default class Modlet {
   constructor(file: string) {
     let xml: any | undefined;
     let raw: any | undefined;
-    const folder = path.basename(path.dirname(file));
+    const folder = path.posix.basename(path.posix.dirname(file));
 
     this._data = {};
     this._errors = [];
@@ -79,20 +79,6 @@ export default class Modlet {
     }
 
     this._enabled = enabled;
-  }
-
-  install(installTo: string) {
-    const installFrom = path.dirname(this.modInfo.file);
-
-    if (!installTo) {
-      throw new Error("Must provide the destination to install");
-    }
-
-    if (installFrom === installTo || fileExists(installTo)) {
-      throw new Error(`Error: ${installTo} is already installed`);
-    }
-
-    return fs.promises.symlink(installFrom, installTo, "junction");
   }
 
   // TODO: Validate code goes here

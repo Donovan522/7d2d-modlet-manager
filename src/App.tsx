@@ -128,7 +128,7 @@ function App(props: AppProps): React.ReactElement {
           stateDispatch({ type: "setGameFolder", payload: newFolder });
 
           if (!state.config.modletFolder)
-            stateDispatch({ type: "setModletFolder", payload: path.join(newFolder, "Mods") });
+            stateDispatch({ type: "setModletFolder", payload: path.posix.join(newFolder, "Mods") });
         }
       });
     },
@@ -161,17 +161,17 @@ function App(props: AppProps): React.ReactElement {
 
   useEffect(() => {
     if (!loading && !state.config.modletFolder && state.config.gameFolder)
-      stateDispatch({ type: "setModletFolder", payload: path.join(state.config.gameFolder, "Mods") });
+      stateDispatch({ type: "setModletFolder", payload: path.posix.join(state.config.gameFolder, "Mods") });
   }, [loading, state.config.gameFolder, state.config.modletFolder]);
   // Get list of modlets
   useEffect(() => {
-    if (!loading && !state.modlets.length && state.config.gameFolder) {
+    if (state.config.modletFolder && state.config.gameFolder) {
       let newModletList = getModlets(
-        state.advancedMode ? state.config.modletFolder : path.join(state.config.gameFolder, "Mods")
+        state.advancedMode ? state.config.modletFolder : path.posix.join(state.config.gameFolder, "Mods")
       );
       if (newModletList.length) stateDispatch({ type: "setModlets", payload: newModletList });
     }
-  }, [loading, state.modlets, state.advancedMode, state.config.modletFolder, state.config.gameFolder]);
+  }, [state.advancedMode, state.config.modletFolder, state.config.gameFolder]);
 
   if (!loading && (state === undefined || state.config.gameFolder === undefined)) {
     return (
@@ -181,7 +181,7 @@ function App(props: AppProps): React.ReactElement {
     );
   }
 
-  if (loading || !state.config.gameFolder || !state.config.modletFolder)
+  if (loading && (!state.config.gameFolder || !state.config.modletFolder))
     return <CircularProgress className={classes.noGameFolder} />;
 
   return (

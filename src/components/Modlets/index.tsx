@@ -116,7 +116,9 @@ function Modlets(props: ModletsProps): React.ReactElement {
   let modletList: React.ReactNode[] | React.ReactNode;
   const [button, setButton] = useState(<span />);
   const classes = useStyles();
-  const modsPath = props.state.config.gameFolder ? path.join(props.state.config.gameFolder, "Mods") : "";
+  const modsPath = props.state.config.gameFolder
+    ? path.win32.normalize(path.join(props.state.config.gameFolder, "Mods"))
+    : "";
 
   modletList = props.state.modlets.length
     ? props.state.advancedMode
