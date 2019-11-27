@@ -16,6 +16,7 @@ import path from "path";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { hot } from "react-hot-loader";
 import theme from "helpers/theme";
+import isDev from "electron-is-dev";
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
@@ -46,13 +47,19 @@ function App(props: AppProps): React.ReactElement {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
 
-  let initialState = () => ({
+  let initialState = (): IState => ({
     advancedMode: !!parseInt(props.store.get("mode")),
     config: props.store.store,
+    gameFolder: null,
+    modletFolder: null,
     modlets: []
   });
 
-  const stateReducer = (state: any, action: { type: string; payload?: any }) => {
+  const stateReducer = (state: IState, action: { type: string; payload?: any }) => {
+    const sortModlets = (a: IModletState, b: IModletState) => (a.modlet.get("name") > b.modlet.get("name") ? 1 : -1);
+
+    if (isDev) console.log("Dispatch received:", action);
+
     switch (action.type) {
       case "setAdvancedMode":
         props.store.set("mode", action.payload ? 1 : 0);
@@ -81,19 +88,20 @@ function App(props: AppProps): React.ReactElement {
       case "setModlets":
         return {
           ...state,
-          modlets: action.payload
+          modlets: action.payload.sort(sortModlets)
         };
 
-      case "addModlet":
-        return {
-          ...state,
-          modlets: [...state.modlets, action.payload]
-        };
+      case "syncModlets":
+        const modletState = state.modlets.filter((obj: IModletState) => obj.modlet === action.payload.modlet)[0];
 
-      case "clearModlets":
+        if (!modletState) throw new Error("syncModlets dispatch received invalid modlet");
+
+        const modletStates = state.modlets.filter((obj: IModletState) => obj.modlet !== action.payload.modlet);
+        const newModletState = { ...modletState, ...action.payload };
+
         return {
           ...state,
-          modlets: []
+          modlets: [...modletStates, newModletState].sort(sortModlets)
         };
 
       default:
@@ -212,7 +220,7 @@ function App(props: AppProps): React.ReactElement {
               />
             </Collapse>
           </List>
-          <Modlets state={state} />
+          <Modlets state={state} stateDispatch={stateDispatch} />
         </Container>
       </Box>
     </ThemeProvider>

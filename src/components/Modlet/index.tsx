@@ -15,14 +15,15 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import RadioButtonUncheckedIcon from "@material-ui/icons/RadioButtonUnchecked";
 import { remote } from "electron";
 import fs from "fs";
-import { fileExists, Modlet } from "helpers";
+import { fileExists } from "helpers";
 import path from "path";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
 
 interface ModletProps {
-  state: any;
-  modlet: Modlet;
+  state: IState;
+  modletState: IModletState;
+  handleValidation: any;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -32,8 +33,9 @@ const useStyles = makeStyles(theme => ({
   box: {
     display: "flex",
     flexFlow: "column",
-    alignContent: "center",
-    justifyContent: "center"
+    alignContent: "flex-start",
+    justifyContent: "flex-end",
+    marginLeft: "auto"
   },
   cardVersion: {
     fontStyle: "italic",
@@ -59,24 +61,27 @@ const useStyles = makeStyles(theme => ({
   checkbox: {
     padding: 0,
     paddingRight: theme.spacing(1)
+  },
+  validationErrors: {
+    color: red[500],
+    paddingTop: theme.spacing(1)
   }
 }));
 
 function ModletComponent(props: ModletProps): React.ReactElement {
-  const { modlet, state } = props;
+  const { modletState, state } = props;
 
-  const modletDir = path.win32.normalize(path.dirname(modlet.modInfo.file));
+  const modletDir = path.win32.normalize(path.dirname(modletState.modlet.modInfo.file));
   const modletInstallPath = path.win32.normalize(path.join(state.config.gameFolder, "Mods", path.basename(modletDir)));
   const modletLocal = modletDir === modletInstallPath;
 
   const classes = useStyles();
-  const valid = modlet.isValid();
 
   const checkedOK: React.ReactNode = <CheckCircleIcon className={classes.iconOK} />;
   const checkedFAIL: React.ReactNode = <CancelIcon className={classes.iconNotOK} />;
-  const checkedNuetral: React.ReactNode = <RadioButtonUncheckedIcon />;
+  const checkedNeutral: React.ReactNode = <RadioButtonUncheckedIcon />;
 
-  const [enabled, setEnabled] = useState(modlet.isEnabled());
+  const [enabled, setEnabled] = useState(modletState.modlet.isEnabled());
   const [installed, setInstalled] = useState(fileExists(modletInstallPath));
 
   const conditions: React.ReactNode[] = [];
@@ -88,14 +93,14 @@ function ModletComponent(props: ModletProps): React.ReactElement {
           <Checkbox
             disableRipple
             disabled={modletDir === modletInstallPath}
-            icon={checkedNuetral}
+            icon={checkedNeutral}
             checkedIcon={checkedOK}
             checked={installed}
             onChange={e => handleInstallClick(e)}
             className={classes.checkbox}
           />
         }
-        label="Installed"
+        label={installed ? "Installed" : "Not Installed"}
       />
     );
 
@@ -105,27 +110,28 @@ function ModletComponent(props: ModletProps): React.ReactElement {
       control={
         <Checkbox
           disableRipple
-          icon={checkedNuetral}
+          icon={checkedNeutral}
           checkedIcon={checkedOK}
           checked={enabled}
           onChange={e => handleEnableClick(e)}
           className={classes.checkbox}
         />
       }
-      label="Enabled"
+      label={enabled ? "Enabled" : "Disabled"}
     />,
     <FormControlLabel
       key="status-validated"
       control={
         <Checkbox
           disableRipple
-          icon={checkedFAIL}
-          checkedIcon={checkedOK}
-          checked={valid}
+          icon={checkedNeutral}
+          checkedIcon={modletState.modlet.isValidXML() ? checkedOK : checkedFAIL}
+          checked={modletState.validated}
+          onChange={() => props.handleValidation(modletState)}
           className={classes.checkbox}
         />
       }
-      label="Validated"
+      label={modletState.validated ? (modletState.modlet.isValidXML() ? "Valid" : "Errors") : "Validate"}
     />
   );
 
@@ -144,7 +150,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
         if (modletLocal) throw new Error(`Error: Will not remove original modlet ${modletInstallPath}`);
 
         if (!fileExists(modletInstallPath) || !fs.statSync(modletInstallPath).isDirectory())
-          throw new Error(`Error: ${modlet.modInfo.folder} is not installed`);
+          throw new Error(`Error: ${modletState.modlet.modInfo.folder} is not installed`);
 
         fs.unlinkSync(modletInstallPath);
       } catch (err) {
@@ -170,16 +176,28 @@ function ModletComponent(props: ModletProps): React.ReactElement {
 
   const handleEnableClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEnabled(event.target.checked);
-    modlet.enable(event.target.checked);
+    modletState.modlet.enable(event.target.checked);
   };
 
   const modletData = {
-    name: modlet.get("name"),
-    author: modlet.get("author"),
-    description: modlet.get("description"),
-    version: modlet.get("version"),
-    compatibility: modlet.get("compat")
+    name: modletState.modlet.get("name"),
+    author: modletState.modlet.get("author"),
+    description: modletState.modlet.get("description"),
+    version: modletState.modlet.get("version"),
+    compatibility: modletState.modlet.get("compat")
   };
+
+  const errorBlock = (
+    <ul>
+      {modletState.modlet.errors().map((error, index) => (
+        <li key={index}>
+          <Typography className={classes.validationErrors} variant="body2" color="textSecondary">
+            {error}
+          </Typography>
+        </li>
+      ))}
+    </ul>
+  );
 
   return state.advancedMode ? (
     <TableRow>
@@ -188,6 +206,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
         <Typography className={classes.description} variant="body2" color="textSecondary">
           {modletData.description}
         </Typography>
+        {!modletState.modlet.isValid() && errorBlock}
       </TableCell>
       <TableCell>
         <Typography>{modletData.author}</Typography>
@@ -198,7 +217,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
           {modletData.compatibility}
         </Typography>
       </TableCell>
-      <TableCell align="center">
+      <TableCell>
         <Box className={classes.box}>{conditions}</Box>
       </TableCell>
     </TableRow>
@@ -228,7 +247,8 @@ function ModletComponent(props: ModletProps): React.ReactElement {
 
 ModletComponent.propTypes = {
   state: PropTypes.object.isRequired,
-  modlet: PropTypes.instanceOf(Modlet).isRequired
+  modletState: PropTypes.object.isRequired,
+  handleValidation: PropTypes.func.isRequired
 };
 
 export default ModletComponent;
