@@ -36,7 +36,7 @@ function readGameXML(gameFiles: string[]) {
   return XMLDocument;
 }
 
-function evaluateXPath(xpath: string, newValue: string | null): string | undefined {
+function evaluateXPath(command: string, xpath: string, newValue: string | null): string | undefined {
   let nodes = [];
 
   const result = gameXML.evaluate(xpath, gameXML, null, XPathResult.ANY_TYPE, null);
@@ -48,7 +48,12 @@ function evaluateXPath(xpath: string, newValue: string | null): string | undefin
   }
 
   if (!nodes.length) return `Could not apply ${xpath}`;
-  if (newValue !== null) nodes.forEach(node => (node.nodeValue = newValue));
+  if (command === "set" && newValue !== null) nodes.forEach(node => (node.nodeValue = newValue));
+  if (command === "remove") {
+    nodes.forEach(node => {
+      if (node.parentNode) node.parentNode.removeChild(node);
+    });
+  }
 }
 
 export default function validateXML(options: { gameFolder: string; modletFolder: string }) {
@@ -58,6 +63,8 @@ export default function validateXML(options: { gameFolder: string; modletFolder:
 
   return new Promise<string[]>((resolve, reject) => {
     let errorArray: string[] = [];
+    // let commandArray = ["set", "append", "remove"]
+    let commandArray = ["set", "remove"];
 
     gameXML = readGameXML(folderTree(path.join(gameFolder, "Data", "Config")));
 
@@ -65,22 +72,32 @@ export default function validateXML(options: { gameFolder: string; modletFolder:
       const node = xmlNode(file);
 
       if (node) {
-        const set = node.getElementsByTagName("set");
+        Array.from(node.childNodes).forEach(childNode => {
+          const tag = childNode.nodeName;
+          let newValue = null;
 
-        if (set.length) {
-          Array.from(set).forEach(setItem => {
-            const fileXPath = setItem.getAttribute("xpath");
-            const newValue = setItem.textContent;
+          if (commandArray.includes(tag)) {
+            let fileXPath;
+
+            if (tag === "set") newValue = childNode.textContent;
+
+            if (childNode.childNodes[0] && childNode.childNodes[0].parentElement)
+              fileXPath = childNode.childNodes[0].parentElement.getAttribute("xpath");
 
             if (fileXPath) {
               // xpath must begin with '//' to match items in gameXML
               const xpath = fileXPath.replace(/^\/*(\w+)/, "//$1");
 
-              let result = evaluateXPath(xpath, newValue);
+              // if (tag === 'remove') {
+              // console.log(`Evaluating ${tag} ${xpath}`);
+              // if (newValue) console.log("Repacing contents with", newValue);
+              // }
+
+              let result = evaluateXPath(tag, xpath, newValue);
               if (result) errorArray.push(result);
             }
-          });
-        }
+          }
+        });
       } else {
         reject(new Error(`Could not read XML Node from ${file}`));
       }
