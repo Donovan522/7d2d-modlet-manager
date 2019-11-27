@@ -32,8 +32,9 @@ const useStyles = makeStyles(theme => ({
   box: {
     display: "flex",
     flexFlow: "column",
-    alignContent: "center",
-    justifyContent: "center"
+    alignContent: "flex-start",
+    justifyContent: "flex-end",
+    marginLeft: "auto"
   },
   cardVersion: {
     fontStyle: "italic",
@@ -59,6 +60,10 @@ const useStyles = makeStyles(theme => ({
   checkbox: {
     padding: 0,
     paddingRight: theme.spacing(1)
+  },
+  validationErrors: {
+    color: red[500],
+    paddingTop: theme.spacing(1)
   }
 }));
 
@@ -70,7 +75,6 @@ function ModletComponent(props: ModletProps): React.ReactElement {
   const modletLocal = modletDir === modletInstallPath;
 
   const classes = useStyles();
-  const valid = modlet.isValid();
 
   const checkedOK: React.ReactNode = <CheckCircleIcon className={classes.iconOK} />;
   const checkedFAIL: React.ReactNode = <CancelIcon className={classes.iconNotOK} />;
@@ -78,6 +82,8 @@ function ModletComponent(props: ModletProps): React.ReactElement {
 
   const [enabled, setEnabled] = useState(modlet.isEnabled());
   const [installed, setInstalled] = useState(fileExists(modletInstallPath));
+  const [validationRun, setValidationRun] = useState(modlet.xmlValidationHasRun());
+  const [validationRunning, setValidationRunning] = useState(false);
 
   const conditions: React.ReactNode[] = [];
   if (!modletLocal)
@@ -95,7 +101,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
             className={classes.checkbox}
           />
         }
-        label="Installed"
+        label={installed ? "Installed" : "Not Installed"}
       />
     );
 
@@ -112,20 +118,29 @@ function ModletComponent(props: ModletProps): React.ReactElement {
           className={classes.checkbox}
         />
       }
-      label="Enabled"
+      label={enabled ? "Enabled" : "Disaabled"}
     />,
     <FormControlLabel
       key="status-validated"
       control={
         <Checkbox
           disableRipple
-          icon={checkedFAIL}
-          checkedIcon={checkedOK}
-          checked={valid}
+          icon={checkedNuetral}
+          checkedIcon={modlet.isValidXML() ? checkedOK : checkedFAIL}
+          checked={validationRun}
+          onChange={e => handleValidation(e)}
           className={classes.checkbox}
         />
       }
-      label="Validated"
+      label={
+        validationRunning
+          ? "Validating"
+          : modlet.xmlValidationHasRun()
+          ? modlet.isValid()
+            ? "Valid"
+            : "Errors"
+          : "Validate"
+      }
     />
   );
 
@@ -173,6 +188,17 @@ function ModletComponent(props: ModletProps): React.ReactElement {
     modlet.enable(event.target.checked);
   };
 
+  const handleValidation = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (validationRunning) return;
+
+    setValidationRunning(true);
+
+    modlet.validateXML(state.config.gameFolder).then(() => {
+      setValidationRunning(false);
+      setValidationRun(true);
+    });
+  };
+
   const modletData = {
     name: modlet.get("name"),
     author: modlet.get("author"),
@@ -181,6 +207,18 @@ function ModletComponent(props: ModletProps): React.ReactElement {
     compatibility: modlet.get("compat")
   };
 
+  const errorBlock = (
+    <ul>
+      {modlet.errors().map((error, index) => (
+        <li key={index}>
+          <Typography className={classes.validationErrors} variant="body2" color="textSecondary">
+            {error}
+          </Typography>
+        </li>
+      ))}
+    </ul>
+  );
+
   return state.advancedMode ? (
     <TableRow>
       <TableCell>
@@ -188,6 +226,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
         <Typography className={classes.description} variant="body2" color="textSecondary">
           {modletData.description}
         </Typography>
+        {!modlet.isValid() && errorBlock}
       </TableCell>
       <TableCell>
         <Typography>{modletData.author}</Typography>
@@ -198,7 +237,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
           {modletData.compatibility}
         </Typography>
       </TableCell>
-      <TableCell align="center">
+      <TableCell>
         <Box className={classes.box}>{conditions}</Box>
       </TableCell>
     </TableRow>

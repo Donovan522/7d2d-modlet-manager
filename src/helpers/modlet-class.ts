@@ -1,12 +1,15 @@
 import fs from "fs";
-import { fileExists } from "helpers";
+import { fileExists, validateXML } from "helpers";
 import path from "path";
 import { Parser } from "xml2js";
 
 export default class Modlet {
   private _data: { [index: string]: string };
-  private _errors: string[];
+  private _validationErrors: string[];
   private _enabled: boolean;
+  private _xmlValidationRun: boolean;
+  private _xmlParser: Parser;
+
   modInfo: { [index in "file" | "folder" | "xml" | "raw"]: string };
 
   constructor(file: string) {
@@ -15,20 +18,20 @@ export default class Modlet {
     const folder = path.posix.basename(path.posix.dirname(file));
 
     this._data = {};
-    this._errors = [];
+    this._validationErrors = [];
+    this._xmlValidationRun = false;
+    this._xmlParser = new Parser({
+      trim: true,
+      normalizeTags: true,
+      explicitRoot: false,
+      explicitArray: false
+    });
 
     if (fileExists(file)) {
-      const xmlparser = new Parser({
-        trim: true,
-        normalizeTags: true,
-        explicitRoot: false,
-        explicitArray: false
-      });
-
-      xmlparser.parseString(fs.readFileSync(file, "utf8"), (err: Error, xmlfile: any) => {
+      this._xmlParser.parseString(fs.readFileSync(file, "utf8"), (err: Error, xmlfile: any) => {
         if (err) {
           console.error("ERROR:", err);
-          this._errors.push(`Error parsing XML file: ${err}`);
+          this._validationErrors.push(`Error parsing XML file: ${err}`);
           throw err;
         }
 
@@ -47,20 +50,42 @@ export default class Modlet {
 
     this._enabled = !path.posix.basename(file).match(/disabled/i);
 
-    this._validate();
+    this._validateModInfo();
   }
 
   get(key: string) {
     return this._data[key];
   }
 
-  isValid(): boolean {
-    this._validate();
-    return this._errors.length === 0;
+  errors(): string[] {
+    return this._validationErrors;
   }
 
-  errors(): string[] {
-    return this._errors;
+  isValid(): boolean {
+    this._validateModInfo();
+    return this.errors().length === 0;
+  }
+
+  isValidXML(): boolean {
+    if (this._xmlValidationRun) return this.errors().length === 0;
+
+    return false;
+  }
+
+  xmlValidationHasRun(): boolean {
+    return this._xmlValidationRun;
+  }
+
+  async validateXML(gameFolder: string) {
+    validateXML({
+      modletFolder: path.win32.normalize(path.dirname(this.modInfo.file)),
+      gameFolder: gameFolder
+    })
+      .then(errors => {
+        this._validationErrors = errors;
+        this._xmlValidationRun = true;
+      })
+      .catch((error: string) => console.error(error));
   }
 
   isEnabled(): boolean {
@@ -81,21 +106,19 @@ export default class Modlet {
     this._enabled = enabled;
   }
 
-  // TODO: Validate code goes here
-  // validate(gameFolder: string) {}
-
   _renameModInfo(newModInfoFile: string) {
     fs.renameSync(this.modInfo.file, newModInfoFile);
     this.modInfo.file = newModInfoFile;
   }
 
-  private _validate(): void {
+  private _validateModInfo(): void {
     let errorString: string;
 
     ["author", "description", "name", "version"].forEach((attribute: any) => {
       errorString = `${attribute} is unknown`;
 
-      if (this.get(attribute) === "unknown" && !this._errors.includes(errorString)) this._errors.push(errorString);
+      if (this.get(attribute) === "unknown" && !this._validationErrors.includes(errorString))
+        this._validationErrors.push(errorString);
     });
   }
 

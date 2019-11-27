@@ -78,9 +78,7 @@ function modletsListAdvanced(props: ModletsProps, classes: Record<"paper" | "tab
             <TableCell className={classes.tableHeader} align="right">
               Version
             </TableCell>
-            <TableCell className={classes.tableHeader} align="center">
-              Status
-            </TableCell>
+            <TableCell className={classes.tableHeader}>Status</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
