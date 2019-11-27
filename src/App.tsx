@@ -17,6 +17,7 @@ import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { hot } from "react-hot-loader";
 import theme from "helpers/theme";
 import isDev from "electron-is-dev";
+import menuTemplate from "menu";
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
@@ -126,26 +127,19 @@ function App(props: AppProps): React.ReactElement {
     return null;
   };
 
-  const getGameFolder = useCallback(
-    (event: React.MouseEvent | null | undefined) => {
-      if (event) event.preventDefault();
+  const getGameFolder = useCallback(() => {
+    getFolder('Please select the "7 Days to Die" game folder').then(newFolder => {
+      if (newFolder) {
+        stateDispatch({ type: "clearModlets" });
+        stateDispatch({ type: "setGameFolder", payload: newFolder });
 
-      getFolder('Please select the "7 Days to Die" game folder').then(newFolder => {
-        if (newFolder) {
-          stateDispatch({ type: "clearModlets" });
-          stateDispatch({ type: "setGameFolder", payload: newFolder });
+        if (!state.config.modletFolder)
+          stateDispatch({ type: "setModletFolder", payload: path.posix.join(newFolder, "Mods") });
+      }
+    });
+  }, [state.config.modletFolder]);
 
-          if (!state.config.modletFolder)
-            stateDispatch({ type: "setModletFolder", payload: path.posix.join(newFolder, "Mods") });
-        }
-      });
-    },
-    [state.config.modletFolder]
-  );
-
-  const getModletFolder = (event: React.MouseEvent | null | undefined) => {
-    if (event) event.preventDefault();
-
+  const getModletFolder = () => {
     getFolder('Please Select a valid "7 Days to Die" Modlet Folder').then(newFolder => {
       if (newFolder) {
         stateDispatch({ type: "clearModlets" });
@@ -160,7 +154,7 @@ function App(props: AppProps): React.ReactElement {
   };
 
   useEffect(() => {
-    if (!state.config.gameFolder) getGameFolder(null);
+    if (!state.config.gameFolder) getGameFolder();
   }, [state.config.gameFolder, getGameFolder]);
 
   useEffect(() => {
@@ -191,6 +185,15 @@ function App(props: AppProps): React.ReactElement {
 
   if (loading && (!state.config.gameFolder || !state.config.modletFolder))
     return <CircularProgress className={classes.noGameFolder} />;
+
+  const commands = {
+    chooseGameFolder: getGameFolder,
+    chooseModletFolder: getModletFolder,
+    toggleMode: toggleAdvancedMode
+  };
+
+  // @ts-ignore
+  remote.Menu.setApplicationMenu(remote.Menu.buildFromTemplate(menuTemplate(commands)));
 
   return (
     <ThemeProvider theme={theme}>
