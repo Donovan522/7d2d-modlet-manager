@@ -2,8 +2,8 @@ import fs from "fs";
 import { fileExists, Modlet } from "helpers";
 import path from "path";
 
-export default function getModlets(searchFolder: string): Modlet[] {
-  let modletArray: Modlet[] = [];
+export default function getModlets(searchFolder: string): IModletState[] | null[] {
+  let modletArray: IModletState[] = [];
 
   if (!searchFolder) return modletArray;
   if (!fileExists(searchFolder)) return modletArray;
@@ -14,7 +14,10 @@ export default function getModlets(searchFolder: string): Modlet[] {
     if (fs.statSync(filename).isDirectory()) {
       fs.readdirSync(filename).some(file => {
         if (file.match(/modinfo/i)) {
-          modletArray.push(new Modlet(path.posix.join(filename, file)));
+          modletArray.push({
+            modlet: new Modlet(path.posix.join(filename, file)),
+            validated: false
+          });
           return true;
         }
         return false;

@@ -76,16 +76,22 @@ export default class Modlet {
     return this._xmlValidationRun;
   }
 
-  async validateXML(gameFolder: string) {
-    validateXML({
-      modletFolder: path.win32.normalize(path.dirname(this.modInfo.file)),
-      gameFolder: gameFolder
-    })
-      .then(errors => {
-        this._validationErrors = errors;
-        this._xmlValidationRun = true;
+  validate(gameFolder: string) {
+    return new Promise((resolve, reject) => {
+      validateXML({
+        modletFolder: path.win32.normalize(path.dirname(this.modInfo.file)),
+        gameFolder: gameFolder
       })
-      .catch((error: string) => console.error(error));
+        .then((response: string[]) => {
+          this._validationErrors = response;
+          this._xmlValidationRun = true;
+          resolve(response);
+        })
+        .catch((error: string) => {
+          console.error(error);
+          reject(error);
+        });
+    });
   }
 
   isEnabled(): boolean {

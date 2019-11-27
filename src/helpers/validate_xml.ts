@@ -59,8 +59,6 @@ function evaluateXPath(command: string, xpath: string, newValue: string | null):
 export default function validateXML(options: { gameFolder: string; modletFolder: string }) {
   const { gameFolder, modletFolder } = options;
 
-  console.info("Running XML Validation against", modletFolder);
-
   return new Promise<string[]>((resolve, reject) => {
     let errorArray: string[] = [];
     // let commandArray = ["set", "append", "remove"]
@@ -88,11 +86,6 @@ export default function validateXML(options: { gameFolder: string; modletFolder:
               // xpath must begin with '//' to match items in gameXML
               const xpath = fileXPath.replace(/^\/*(\w+)/, "//$1");
 
-              // if (tag === 'remove') {
-              // console.log(`Evaluating ${tag} ${xpath}`);
-              // if (newValue) console.log("Repacing contents with", newValue);
-              // }
-
               let result = evaluateXPath(tag, xpath, newValue);
               if (result) errorArray.push(result);
             }
@@ -102,8 +95,6 @@ export default function validateXML(options: { gameFolder: string; modletFolder:
         reject(new Error(`Could not read XML Node from ${file}`));
       }
     });
-
-    console.info("Returning with", errorArray.length ? "errors!" : "no errors");
 
     resolve(errorArray);
   });
