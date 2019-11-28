@@ -79,6 +79,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
 
   const checkedOK: React.ReactNode = <CheckCircleIcon className={classes.iconOK} />;
   const checkedFAIL: React.ReactNode = <CancelIcon className={classes.iconNotOK} />;
+  const checkedDISABLED: React.ReactNode = <CancelIcon color="primary" />;
   const checkedNeutral: React.ReactNode = <RadioButtonUncheckedIcon />;
 
   const [enabled, setEnabled] = useState(modletState.modlet.isEnabled());
@@ -110,7 +111,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
       control={
         <Checkbox
           disableRipple
-          icon={checkedNeutral}
+          icon={checkedDISABLED}
           checkedIcon={checkedOK}
           checked={enabled}
           onChange={e => handleEnableClick(e)}

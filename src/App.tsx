@@ -4,20 +4,22 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Collapse from "@material-ui/core/Collapse";
 import Container from "@material-ui/core/Container";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import Fab from "@material-ui/core/Fab";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import List from "@material-ui/core/List";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import Switch from "@material-ui/core/Switch";
+import RefreshIcon from "@material-ui/icons/Refresh";
 import FolderPicker from "components/FolderPicker";
 import Modlets from "components/Modlets";
 import { remote } from "electron";
+import isDev from "electron-is-dev";
 import { getModlets } from "helpers";
+import theme from "helpers/theme";
+import menuTemplate from "menu";
 import path from "path";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { hot } from "react-hot-loader";
-import theme from "helpers/theme";
-import isDev from "electron-is-dev";
-import menuTemplate from "menu";
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
@@ -30,6 +32,12 @@ const useStyles = makeStyles(theme => ({
     overflowY: "auto",
     height: "100%"
   },
+  controlsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignContent: "center"
+  },
   modeControl: {
     padding: theme.spacing(1)
   },
@@ -37,6 +45,13 @@ const useStyles = makeStyles(theme => ({
     display: "block",
     margin: "auto",
     marginTop: 200
+  },
+  refreshButton: {
+    margin: theme.spacing(1)
+  },
+  refreshIcon: {
+    marginRight: theme.spacing(1),
+    color: theme.palette.secondary.main
   }
 }));
 
@@ -47,6 +62,7 @@ interface AppProps {
 function App(props: AppProps): React.ReactElement {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
+  const [refreshModlets, setRefreshModlets] = useState(0);
 
   let initialState = (): IState => ({
     advancedMode: !!parseInt(props.store.get("mode")),
@@ -178,7 +194,7 @@ function App(props: AppProps): React.ReactElement {
       );
       if (newModletList.length) stateDispatch({ type: "setModlets", payload: newModletList });
     }
-  }, [state.advancedMode, state.config.modletFolder, state.config.gameFolder]);
+  }, [refreshModlets, state.advancedMode, state.config.modletFolder, state.config.gameFolder]);
 
   if (!loading && (state === undefined || state.config.gameFolder === undefined)) {
     return (
@@ -194,7 +210,8 @@ function App(props: AppProps): React.ReactElement {
   const commands = {
     chooseGameFolder: getGameFolder,
     chooseModletFolder: getModletFolder,
-    toggleMode: toggleAdvancedMode
+    toggleMode: toggleAdvancedMode,
+    refreshModlets: () => setRefreshModlets(Math.random())
   };
 
   // @ts-ignore
@@ -205,11 +222,24 @@ function App(props: AppProps): React.ReactElement {
       <CssBaseline />
       <Box className={classes.mainContainer}>
         <Container maxWidth="xl" className={classes.bodyContainer}>
-          <FormControlLabel
-            className={classes.modeControl}
-            control={<Switch size="small" checked={state.advancedMode} onChange={toggleAdvancedMode} />}
-            label={state.advancedMode ? "Advanced Mode" : "Basic Mode"}
-          />
+          <Box className={classes.controlsContainer}>
+            <FormControlLabel
+              className={classes.modeControl}
+              control={<Switch size="small" checked={state.advancedMode} onChange={toggleAdvancedMode} />}
+              label={state.advancedMode ? "Advanced Mode" : "Basic Mode"}
+            />
+            <Fab
+              variant="extended"
+              size="medium"
+              color="primary"
+              aria-label="refresh"
+              className={classes.refreshButton}
+              onClick={() => setRefreshModlets(Math.random())}
+            >
+              <RefreshIcon className={classes.refreshIcon} />
+              Refresh
+            </Fab>
+          </Box>
           <List dense={true}>
             <FolderPicker
               advancedMode={state.advancedMode}
