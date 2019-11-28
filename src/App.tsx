@@ -51,14 +51,12 @@ function App(props: AppProps): React.ReactElement {
   let initialState = (): IState => ({
     advancedMode: !!parseInt(props.store.get("mode")),
     config: props.store.store,
-    gameFolder: null,
-    modletFolder: null,
     modlets: []
   });
 
-  const stateReducer = (state: IState, action: { type: string; payload?: any }) => {
-    const sortModlets = (a: IModletState, b: IModletState) => (a.modlet.get("name") > b.modlet.get("name") ? 1 : -1);
+  const sortModlets = (a: IModletState, b: IModletState) => (a.modlet.get("name") > b.modlet.get("name") ? 1 : -1);
 
+  const stateReducer = (state: IState, action: { type: string; payload?: any }) => {
     if (isDev) console.log("Dispatch received:", action);
 
     switch (action.type) {
@@ -92,6 +90,12 @@ function App(props: AppProps): React.ReactElement {
           modlets: action.payload.sort(sortModlets)
         };
 
+      case "clearModlets":
+        return {
+          ...state,
+          modlets: []
+        };
+
       case "syncModlets":
         const modletState = state.modlets.filter((obj: IModletState) => obj.modlet === action.payload.modlet)[0];
 
@@ -106,6 +110,7 @@ function App(props: AppProps): React.ReactElement {
         };
 
       default:
+        if (isDev) console.warn("Dispatch called with invalid type", action.type);
         return state;
     }
   };
@@ -163,13 +168,13 @@ function App(props: AppProps): React.ReactElement {
 
   useEffect(() => {
     if (!loading && !state.config.modletFolder && state.config.gameFolder)
-      stateDispatch({ type: "setModletFolder", payload: path.posix.join(state.config.gameFolder, "Mods") });
+      stateDispatch({ type: "setModletFolder", payload: path.join(state.config.gameFolder, "Mods") });
   }, [loading, state.config.gameFolder, state.config.modletFolder]);
-  // Get list of modlets
+
   useEffect(() => {
     if (state.config.modletFolder && state.config.gameFolder) {
       let newModletList = getModlets(
-        state.advancedMode ? state.config.modletFolder : path.posix.join(state.config.gameFolder, "Mods")
+        state.advancedMode ? state.config.modletFolder : path.join(state.config.gameFolder, "Mods")
       );
       if (newModletList.length) stateDispatch({ type: "setModlets", payload: newModletList });
     }

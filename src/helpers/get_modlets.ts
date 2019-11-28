@@ -8,7 +8,7 @@ export default function getModlets(searchFolder: string): IModletState[] | null[
   if (!searchFolder) return modletArray;
   if (!fileExists(searchFolder)) return modletArray;
 
-  fs.readdirSync(searchFolder).forEach(entry => {
+  fs.readdirSync(path.posix.normalize(searchFolder)).forEach(entry => {
     const filename: string = path.posix.join(searchFolder, entry);
 
     if (fs.statSync(filename).isDirectory()) {

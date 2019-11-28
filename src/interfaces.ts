@@ -17,8 +17,10 @@ interface IModletState {
 
 interface IState {
   advancedMode: boolean;
-  config: any;
-  gameFolder: string | null;
-  modletFolder: string | null;
+  config: {
+    gameFolder: string;
+    modletFolder: string;
+    mode: number;
+  };
   modlets: IModletState[];
 }
