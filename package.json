@@ -22,6 +22,17 @@
     "mac": {
       "category": "public.app-category.utilities"
     },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    },
     "files": [
       "build/**/*",
       "node_modules/**/*"
@@ -38,17 +49,19 @@
   },
   "main": "public/electron.js",
   "scripts": {
-    "dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "dev": "concurrently 'cross-env BROWSER=none yarn start' 'wait-on http://localhost:3000; electron .'",
     "start": "rescripts start",
     "build": "rescripts build",
     "dist": "yarn build && electron-builder -w",
     "release": "yarn build && electron-builder -w -p 'onTagOrDraft'",
     "test": "react-scripts test",
     "test-coverage": "react-scripts test --coverage",
+    "pack": "electron-builder --dir",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
     "electron-pack": "build -w",
-    "lint": "eslint src --ext .ts --ext .tsx"
+    "lint": "eslint src --ext .ts --ext .tsx",
+    "win-cert": "electron-builder create-self-signed-cert -p donovanyoung.com"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -68,8 +81,7 @@
   "dependencies": {
     "@material-ui/core": "^4.6.1",
     "@material-ui/icons": "^4.5.1",
-    "clsx": "^1.0.4",
-    "electron": "^7.1.1",
+    "electron-is-dev": "^1.1.0",
     "electron-store": "^5.1.0",
     "electron-window-state": "^5.0.3",
     "react": "^16.11.0",
@@ -93,8 +105,8 @@
     "@typescript-eslint/parser": "^2.8.0",
     "concurrently": "^5.0.0",
     "cross-env": "^6.0.3",
+    "electron": "^7.1.1",
     "electron-builder": "^21.2.0",
-    "electron-is-dev": "^1.1.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
     "mock-fs": "^4.10.3",

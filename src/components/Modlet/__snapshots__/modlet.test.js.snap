@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Modlet Advanced Mode should render correctly 1`] = `ShallowWrapper {}`;
+
+exports[`Modlet Basic Mode should render correctly 1`] = `ShallowWrapper {}`;
