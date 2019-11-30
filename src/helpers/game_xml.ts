@@ -45,7 +45,11 @@ export default class GameXML {
     return xml;
   }
 
-  private evaluateXPath(command: string, xpath: string, newValue: string | null): string | undefined {
+  private evaluateXPath(
+    command: string,
+    xpath: string,
+    newValue: string | NodeListOf<ChildNode> | null
+  ): string | undefined {
     let nodes = [];
 
     const result = this._gameXML.evaluate(xpath, this._gameXML, null, XPathResult.ANY_TYPE, null);
@@ -57,7 +61,15 @@ export default class GameXML {
     }
 
     if (!nodes.length) return `Could not apply ${xpath}`;
-    if (command === "set" && newValue !== null) nodes.forEach(node => (node.nodeValue = newValue));
+    if (command === "set" && newValue && typeof newValue === "string")
+      nodes.forEach(node => (node.nodeValue = newValue));
+    if (command === "append" && newValue && typeof newValue !== "string") {
+      nodes.forEach(node => {
+        newValue.forEach((child: ChildNode) => {
+          if (node.parentNode) node.appendChild(child);
+        });
+      });
+    }
     if (command === "remove") {
       nodes.forEach(node => {
         if (node.parentNode) node.parentNode.removeChild(node);
@@ -72,21 +84,23 @@ export default class GameXML {
   public validate(modlet: Modlet): Promise<string[]> {
     return new Promise<string[]>((resolve, reject) => {
       let errorArray: string[] = [];
-      // let commandArray = ["set", "append", "remove"];
-      let commandArray = ["set", "remove"];
+      let commandArray = ["set", "append", "remove"];
 
       this.folderTree(path.join(modlet.modInfo.folderPath, "Config")).forEach((file: string) => {
         const node = this.xmlNode(file);
 
         if (node) {
           Array.from(node.childNodes).forEach(childNode => {
-            const tag = childNode.nodeName;
+            const command = childNode.nodeName;
             let newValue = null;
 
-            if (commandArray.includes(tag)) {
+            if (commandArray.includes(command)) {
               let fileXPath;
 
-              if (tag === "set") newValue = childNode.textContent;
+              if (command === "set") newValue = childNode.textContent;
+              if (command === "append") {
+                newValue = childNode.childNodes;
+              }
 
               if (childNode.childNodes[0] && childNode.childNodes[0].parentElement)
                 fileXPath = childNode.childNodes[0].parentElement.getAttribute("xpath");
@@ -95,7 +109,7 @@ export default class GameXML {
                 // xpath must begin with '//' to match items in gameXML
                 const xpath = fileXPath.replace(/^\/*(\w+)/, "//$1");
 
-                let result = this.evaluateXPath(tag, xpath, newValue);
+                let result = this.evaluateXPath(command, xpath, newValue);
                 if (result) errorArray.push(result);
               }
             }
