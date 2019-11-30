@@ -9,17 +9,18 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import List from "@material-ui/core/List";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import Switch from "@material-ui/core/Switch";
-import RefreshIcon from "@material-ui/icons/Refresh";
+import LaunchIcon from "@material-ui/icons/Launch";
 import FolderPicker from "components/FolderPicker";
 import Modlets from "components/Modlets";
 import { remote } from "electron";
 import isDev from "electron-is-dev";
-import { getModlets, GameXML } from "helpers";
+import { getModlets, GameXML, fileExists } from "helpers";
 import theme from "helpers/theme";
 import menuTemplate from "menu";
 import path from "path";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { hot } from "react-hot-loader";
+import { execFile } from "child_process";
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
@@ -46,10 +47,10 @@ const useStyles = makeStyles(theme => ({
     margin: "auto",
     marginTop: 200
   },
-  refreshButton: {
+  launchButton: {
     margin: theme.spacing(1)
   },
-  refreshIcon: {
+  launchIcon: {
     marginRight: theme.spacing(1),
     color: theme.palette.secondary.main
   }
@@ -61,6 +62,8 @@ interface AppProps {
 
 function App(props: AppProps): React.ReactElement {
   const classes = useStyles();
+  const gameExecutable = "7DaysToDie.exe";
+  // const gameExecutableEAC = "7DaysToDie_EAC.exe";
   const [loading, setLoading] = useState(false);
 
   const initialState: IState = {
@@ -152,6 +155,26 @@ function App(props: AppProps): React.ReactElement {
 
   const [state, stateDispatch] = useReducer(stateReducer, initialState, initState);
 
+  const errorDialog = (title: string, err: Error) => {
+    remote.dialog.showMessageBox({
+      type: "error",
+      title: title,
+      message: err.message
+    });
+  };
+
+  const launchGame = () => {
+    const game = path.normalize(path.join(state.config.gameFolder, gameExecutable));
+
+    if (fileExists(game))
+      execFile(game, err => {
+        if (err) {
+          errorDialog("Unable to start 7 Days to Die", err);
+          return;
+        }
+      });
+  };
+
   const refreshModlets = useCallback(
     (modletsPath?: string) => {
       let newModletList = getModlets(
@@ -180,13 +203,16 @@ function App(props: AppProps): React.ReactElement {
   const getGameFolder = useCallback(() => {
     getFolder('Please select the "7 Days to Die" game folder').then(newFolder => {
       if (newFolder) {
-        stateDispatch({ type: "setGameFolder", payload: newFolder });
-
-        if (!state.config.modletFolder) {
-          const newModletFolder = path.posix.join(newFolder, "Mods");
-          stateDispatch({ type: "setModletFolder", payload: newModletFolder });
+        if (fileExists(path.join(newFolder, gameExecutable))) {
+          stateDispatch({ type: "setGameFolder", payload: newFolder });
+          if (!state.config.modletFolder) {
+            const newModletFolder = path.posix.join(newFolder, "Mods");
+            stateDispatch({ type: "setModletFolder", payload: newModletFolder });
+          } else {
+            refreshModlets();
+          }
         } else {
-          refreshModlets();
+          errorDialog("Invalid Game Folder", new Error("The chosen folder is not a valid 7 Days to Die game folder"));
         }
       }
     });
@@ -260,12 +286,12 @@ function App(props: AppProps): React.ReactElement {
               variant="extended"
               size="medium"
               color="primary"
-              aria-label="refresh"
-              className={classes.refreshButton}
-              onClick={() => refreshModlets()}
+              aria-label="Launch 7 Days to Die"
+              className={classes.launchButton}
+              onClick={launchGame}
             >
-              <RefreshIcon className={classes.refreshIcon} />
-              Refresh
+              <LaunchIcon className={classes.launchIcon} />
+              Play Game
             </Fab>
           </Box>
           <List dense={true}>
