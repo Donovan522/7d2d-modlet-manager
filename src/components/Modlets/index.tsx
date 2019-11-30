@@ -68,7 +68,7 @@ function Modlets(props: ModletsProps): React.ReactElement {
   const { state, stateDispatch } = props;
   const [noModsButton, setNoModsButton] = useState(<span />);
   const [validating, setValidating] = useState(false);
-  const [validateButtonLabel, setValidateButtonLabel] = useState("Validate All");
+  const [validateButtonLabel, setValidateButtonLabel] = useState("Validate XMLs");
   const classes = useStyles();
   const modsPath = state.config.gameFolder ? path.win32.normalize(path.join(state.config.gameFolder, "Mods")) : "";
 
@@ -91,7 +91,7 @@ function Modlets(props: ModletsProps): React.ReactElement {
           return (result = result.then(() => handleValidation(modletState)));
         })
       ).then(() => {
-        setValidateButtonLabel("Validate All");
+        setValidateButtonLabel("Validate XMLs");
         setValidating(false);
       });
     }, 500); // necessary for the button to update

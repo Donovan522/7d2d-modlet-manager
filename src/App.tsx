@@ -62,7 +62,6 @@ interface AppProps {
 function App(props: AppProps): React.ReactElement {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
-  const [refreshModlets, setRefreshModlets] = useState(0);
 
   let initialState = (): IState => ({
     advancedMode: !!parseInt(props.store.get("mode")),
@@ -133,6 +132,16 @@ function App(props: AppProps): React.ReactElement {
 
   const [state, stateDispatch] = useReducer(stateReducer, null, initialState);
 
+  const refreshModlets = useCallback(
+    (modletsPath?: string) => {
+      let newModletList = getModlets(
+        modletsPath || state.advancedMode ? state.config.modletFolder : path.join(state.config.gameFolder, "Mods")
+      );
+      if (newModletList.length) stateDispatch({ type: "setModlets", payload: newModletList });
+    },
+    [state.advancedMode, state.config.gameFolder, state.config.modletFolder]
+  );
+
   const getFolder = async (title: string) => {
     setLoading(true);
 
@@ -154,17 +163,23 @@ function App(props: AppProps): React.ReactElement {
         stateDispatch({ type: "clearModlets" });
         stateDispatch({ type: "setGameFolder", payload: newFolder });
 
-        if (!state.config.modletFolder)
-          stateDispatch({ type: "setModletFolder", payload: path.posix.join(newFolder, "Mods") });
+        if (!state.config.modletFolder) {
+          const newModletFolder = path.posix.join(newFolder, "Mods");
+          stateDispatch({ type: "setModletFolder", payload: newModletFolder });
+          refreshModlets(newFolder);
+        } else {
+          refreshModlets();
+        }
       }
     });
-  }, [state.config.modletFolder]);
+  }, [refreshModlets, state.config.modletFolder]);
 
   const getModletFolder = () => {
     getFolder('Please Select a valid "7 Days to Die" Modlet Folder').then(newFolder => {
       if (newFolder) {
         stateDispatch({ type: "clearModlets" });
         stateDispatch({ type: "setModletFolder", payload: newFolder });
+        refreshModlets(newFolder);
       }
     });
   };
@@ -183,18 +198,16 @@ function App(props: AppProps): React.ReactElement {
   }, [state.config.mode]);
 
   useEffect(() => {
-    if (!loading && !state.config.modletFolder && state.config.gameFolder)
-      stateDispatch({ type: "setModletFolder", payload: path.join(state.config.gameFolder, "Mods") });
-  }, [loading, state.config.gameFolder, state.config.modletFolder]);
+    if (!loading && !state.config.modletFolder && state.config.gameFolder) {
+      const newModletFolder = path.join(state.config.gameFolder, "Mods");
+      stateDispatch({ type: "setModletFolder", payload: newModletFolder });
+      refreshModlets(newModletFolder);
+    }
+  }, [refreshModlets, loading, state.config.gameFolder, state.config.modletFolder]);
 
   useEffect(() => {
-    if (state.config.modletFolder && state.config.gameFolder) {
-      let newModletList = getModlets(
-        state.advancedMode ? state.config.modletFolder : path.join(state.config.gameFolder, "Mods")
-      );
-      if (newModletList.length) stateDispatch({ type: "setModlets", payload: newModletList });
-    }
-  }, [refreshModlets, state.advancedMode, state.config.modletFolder, state.config.gameFolder]);
+    if (state.config.modletFolder && state.config.gameFolder) refreshModlets();
+  }, [refreshModlets, state.config.modletFolder, state.config.gameFolder]);
 
   if (!loading && (state === undefined || state.config.gameFolder === undefined)) {
     return (
@@ -211,7 +224,7 @@ function App(props: AppProps): React.ReactElement {
     chooseGameFolder: getGameFolder,
     chooseModletFolder: getModletFolder,
     toggleMode: toggleAdvancedMode,
-    refreshModlets: () => setRefreshModlets(Math.random())
+    refreshModlets: refreshModlets
   };
 
   // @ts-ignore
@@ -234,7 +247,7 @@ function App(props: AppProps): React.ReactElement {
               color="primary"
               aria-label="refresh"
               className={classes.refreshButton}
-              onClick={() => setRefreshModlets(Math.random())}
+              onClick={() => refreshModlets()}
             >
               <RefreshIcon className={classes.refreshIcon} />
               Refresh

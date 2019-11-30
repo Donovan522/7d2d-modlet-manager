@@ -18,7 +18,7 @@
   "build": {
     "appId": "com.donovanyoung.7d2d-modlet-manager",
     "productName": "7 Days to Die Modlet Manager",
-    "copyright": "Copyright © 2019 ${author}",
+    "copyright": "Copyright © 2019 Donovan C. Young",
     "mac": {
       "category": "public.app-category.utilities"
     },
@@ -38,10 +38,7 @@
       "node_modules/**/*"
     ],
     "directories": {
-      "buildResources": [
-        "assets",
-        "public"
-      ]
+      "buildResources": "assets"
     },
     "publish": {
       "provider": "github"
@@ -49,17 +46,17 @@
   },
   "main": "public/electron.js",
   "scripts": {
-    "dev": "concurrently 'cross-env BROWSER=none yarn start' 'wait-on http://localhost:3000; electron .'",
+    "dev": "concurrently -k \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron --inspect .\"",
     "start": "rescripts start",
     "build": "rescripts build",
-    "dist": "yarn build && electron-builder -w",
-    "release": "yarn build && electron-builder -w -p 'onTagOrDraft'",
+    "dist": "yarn build; electron-builder -w",
+    "release": "yarn build; electron-builder -w -p 'onTagOrDraft'",
     "test": "react-scripts test",
     "test-coverage": "react-scripts test --coverage",
     "pack": "electron-builder --dir",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
-    "electron-pack": "build -w",
+    "electron-pack": "electron-builder -w",
     "lint": "eslint src --ext .ts --ext .tsx",
     "win-cert": "electron-builder create-self-signed-cert -p donovanyoung.com"
   },
@@ -78,11 +75,29 @@
       "last 1 safari version"
     ]
   },
+  "quokka": {
+    "env": {
+      "params": {
+        "env": "NODE_PATH=./src"
+      }
+    },
+    "babel": {
+      "ts": true,
+      "presets": [
+        "react-app"
+      ]
+    },
+    "plugins": [
+      "jsdom-quokka-plugin"
+    ]
+  },
   "dependencies": {
     "@material-ui/core": "^4.6.1",
     "@material-ui/icons": "^4.5.1",
     "electron-is-dev": "^1.1.0",
     "electron-store": "^5.1.0",
+    "electron-unhandled": "^3.0.1",
+    "electron-util": "^0.13.0",
     "electron-window-state": "^5.0.3",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
@@ -107,6 +122,8 @@
     "cross-env": "^6.0.3",
     "electron": "^7.1.1",
     "electron-builder": "^21.2.0",
+    "electron-debug": "^3.0.1",
+    "electron-react-devtools": "^0.5.3",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
     "mock-fs": "^4.10.3",

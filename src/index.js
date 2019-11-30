@@ -3,6 +3,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 import Store from "electron-store";
+import unhandled from "electron-unhandled";
+
+unhandled();
 
 ReactDOM.render(<App store={new Store({ name: "7d2dmm" })} />, document.getElementById("root"));
 

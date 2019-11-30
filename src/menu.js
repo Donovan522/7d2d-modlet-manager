@@ -1,3 +1,6 @@
+import path from "path";
+import { aboutMenuItem } from "electron-util";
+
 const template = commands => [
   {
     label: "File",
@@ -27,8 +30,13 @@ const template = commands => [
   },
   { role: "windowMenu" },
   {
-    role: "help",
+    role: "Help",
     submenu: [
+      aboutMenuItem({
+        icon: path.join(__dirname, "static/Icon.png"),
+        copyright: "Copyright © Donovan C. Young",
+        text: "7 Days to Die Modlet Manager"
+      }),
       {
         label: "Learn More",
         click: async () => {

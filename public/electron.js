@@ -5,6 +5,14 @@ const grey = require("@material-ui/core/colors/grey");
 const path = require("path");
 const isDev = require("electron-is-dev");
 const windowStateKeeper = require("electron-window-state");
+const unhandled = require("electron-unhandled");
+const debug = require("electron-debug");
+
+debug({
+  showDevtools: true,
+  devToolsMode: "detach"
+});
+unhandled();
 
 let mainWindow;
 
@@ -37,7 +45,7 @@ function createWindow() {
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
     // Open the DevTools.
     //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on("closed", () => (mainWindow = null));
