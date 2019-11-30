@@ -1,5 +1,5 @@
 import fs from "fs";
-import { fileExists, validateXML } from "helpers";
+import { fileExists } from "helpers";
 import path from "path";
 import { Parser } from "xml2js";
 
@@ -7,19 +7,19 @@ export default class Modlet {
   private _data: { [index: string]: string };
   private _validationErrors: string[];
   private _enabled: boolean;
-  private _xmlValidationRun: boolean;
   private _xmlParser: Parser;
 
-  modInfo: { [index in "file" | "folder" | "xml" | "raw"]: string };
+  modInfo: { [index in "file" | "folderName" | "folderPath"]: string };
 
   constructor(file: string) {
     let xml: any | undefined;
-    let raw: any | undefined;
-    const folder = path.posix.basename(path.posix.dirname(file));
+
+    const folderPath = path.normalize(path.dirname(file));
+    const folderName = path.basename(folderPath);
+    const normalizedFile = path.normalize(file);
 
     this._data = {};
     this._validationErrors = [];
-    this._xmlValidationRun = false;
     this._xmlParser = new Parser({
       trim: true,
       normalizeTags: true,
@@ -27,15 +27,14 @@ export default class Modlet {
       explicitArray: false
     });
 
-    if (fileExists(file)) {
-      this._xmlParser.parseString(fs.readFileSync(file, "utf8"), (err: Error, xmlfile: any) => {
+    if (fileExists(normalizedFile)) {
+      this._xmlParser.parseString(fs.readFileSync(normalizedFile, "utf8"), (err: Error, xmlfile: any) => {
         if (err) {
           console.error("ERROR:", err);
           this._validationErrors.push(`Error parsing XML file: ${err}`);
           throw err;
         }
 
-        raw = xmlfile;
         xml = xmlfile.modinfo;
       });
     }
@@ -46,9 +45,9 @@ export default class Modlet {
     this._data.name = Modlet._getXMLValue(xml, "name");
     this._data.version = Modlet._getXMLValue(xml, "version");
 
-    this.modInfo = { file, folder, xml, raw };
+    this.modInfo = { file: normalizedFile, folderName, folderPath };
 
-    this._enabled = !path.posix.basename(file).match(/disabled/i);
+    this._enabled = !path.basename(normalizedFile).match(/disabled/i);
 
     this._validateModInfo();
   }
@@ -66,34 +65,6 @@ export default class Modlet {
     return this.errors().length === 0;
   }
 
-  isValidXML(): boolean {
-    if (this._xmlValidationRun) return this.errors().length === 0;
-
-    return false;
-  }
-
-  xmlValidationHasRun(): boolean {
-    return this._xmlValidationRun;
-  }
-
-  validate(gameFolder: string) {
-    return new Promise((resolve, reject) => {
-      validateXML({
-        modletFolder: path.win32.normalize(path.dirname(this.modInfo.file)),
-        gameFolder: gameFolder
-      })
-        .then((response: string[]) => {
-          this._validationErrors = response;
-          this._xmlValidationRun = true;
-          resolve(response);
-        })
-        .catch((error: string) => {
-          console.error(error);
-          reject(error);
-        });
-    });
-  }
-
   isEnabled(): boolean {
     return this._enabled;
   }
@@ -101,12 +72,12 @@ export default class Modlet {
   enable(enabled: boolean): void {
     // disable request
     if (!enabled && this.isEnabled()) {
-      this._renameModInfo(path.posix.join(path.posix.dirname(this.modInfo.file), "disabled-ModInfo.xml"));
+      this._renameModInfo(path.join(path.dirname(this.modInfo.file), "disabled-ModInfo.xml"));
     }
 
     // enable request
     if (enabled && !this.isEnabled()) {
-      this._renameModInfo(path.posix.join(path.posix.dirname(this.modInfo.file), "ModInfo.xml"));
+      this._renameModInfo(path.join(path.dirname(this.modInfo.file), "ModInfo.xml"));
     }
 
     this._enabled = enabled;

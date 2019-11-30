@@ -2,7 +2,7 @@ import fs from "fs";
 import { fileExists, Modlet } from "helpers";
 import path from "path";
 
-export default function getModlets(searchFolder: string): IModletState[] | null[] {
+export default function getModlets(searchFolder: string): IModletState[] {
   let modletArray: IModletState[] = [];
 
   if (!searchFolder) return modletArray;
@@ -16,7 +16,8 @@ export default function getModlets(searchFolder: string): IModletState[] | null[
         if (file.match(/modinfo/i)) {
           modletArray.push({
             modlet: new Modlet(path.posix.join(filename, file)),
-            validated: false
+            validated: false,
+            errors: []
           });
           return true;
         }

@@ -14,7 +14,7 @@ import FolderPicker from "components/FolderPicker";
 import Modlets from "components/Modlets";
 import { remote } from "electron";
 import isDev from "electron-is-dev";
-import { getModlets } from "helpers";
+import { getModlets, GameXML } from "helpers";
 import theme from "helpers/theme";
 import menuTemplate from "menu";
 import path from "path";
@@ -63,15 +63,27 @@ function App(props: AppProps): React.ReactElement {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
 
-  let initialState = (): IState => ({
+  const initialState: IState = {
+    advancedMode: false,
+    config: {
+      gameFolder: "",
+      modletFolder: "",
+      mode: 0
+    },
+    gameXML: null,
+    modlets: []
+  };
+
+  const initState = (state: IState): IState => ({
     advancedMode: !!parseInt(props.store.get("mode")),
     config: props.store.store,
+    gameXML: props.store.get("gameFolder") ? new GameXML(props.store.get("gameFolder")) : null,
     modlets: []
   });
 
   const sortModlets = (a: IModletState, b: IModletState) => (a.modlet.get("name") > b.modlet.get("name") ? 1 : -1);
 
-  const stateReducer = (state: IState, action: { type: string; payload?: any }) => {
+  const stateReducer = (state: IState, action: { type: string; payload?: any }): IState => {
     if (isDev) console.log("Dispatch received:", action);
 
     switch (action.type) {
@@ -88,7 +100,8 @@ function App(props: AppProps): React.ReactElement {
 
         return {
           ...state,
-          config: { ...props.store.store, gameFolder: action.payload }
+          config: { ...props.store.store, gameFolder: action.payload },
+          gameXML: new GameXML(action.payload)
         };
 
       case "setModletFolder":
@@ -96,7 +109,8 @@ function App(props: AppProps): React.ReactElement {
 
         return {
           ...state,
-          config: { ...props.store.store, modletFolder: action.payload }
+          config: { ...props.store.store, modletFolder: action.payload },
+          modlets: getModlets(action.payload)
         };
 
       case "setModlets":
@@ -124,13 +138,19 @@ function App(props: AppProps): React.ReactElement {
           modlets: [...modletStates, newModletState].sort(sortModlets)
         };
 
+      case "setGameXML":
+        return {
+          ...state,
+          gameXML: new GameXML(state.config.gameFolder)
+        };
+
       default:
         if (isDev) console.warn("Dispatch called with invalid type", action.type);
         return state;
     }
   };
 
-  const [state, stateDispatch] = useReducer(stateReducer, null, initialState);
+  const [state, stateDispatch] = useReducer(stateReducer, initialState, initState);
 
   const refreshModlets = useCallback(
     (modletsPath?: string) => {
@@ -160,13 +180,11 @@ function App(props: AppProps): React.ReactElement {
   const getGameFolder = useCallback(() => {
     getFolder('Please select the "7 Days to Die" game folder').then(newFolder => {
       if (newFolder) {
-        stateDispatch({ type: "clearModlets" });
         stateDispatch({ type: "setGameFolder", payload: newFolder });
 
         if (!state.config.modletFolder) {
           const newModletFolder = path.posix.join(newFolder, "Mods");
           stateDispatch({ type: "setModletFolder", payload: newModletFolder });
-          refreshModlets(newFolder);
         } else {
           refreshModlets();
         }
@@ -177,9 +195,7 @@ function App(props: AppProps): React.ReactElement {
   const getModletFolder = () => {
     getFolder('Please Select a valid "7 Days to Die" Modlet Folder').then(newFolder => {
       if (newFolder) {
-        stateDispatch({ type: "clearModlets" });
         stateDispatch({ type: "setModletFolder", payload: newFolder });
-        refreshModlets(newFolder);
       }
     });
   };
@@ -201,9 +217,8 @@ function App(props: AppProps): React.ReactElement {
     if (!loading && !state.config.modletFolder && state.config.gameFolder) {
       const newModletFolder = path.join(state.config.gameFolder, "Mods");
       stateDispatch({ type: "setModletFolder", payload: newModletFolder });
-      refreshModlets(newModletFolder);
     }
-  }, [refreshModlets, loading, state.config.gameFolder, state.config.modletFolder]);
+  }, [loading, state.config.gameFolder, state.config.modletFolder]);
 
   useEffect(() => {
     if (state.config.modletFolder && state.config.gameFolder) refreshModlets();

@@ -126,13 +126,13 @@ function ModletComponent(props: ModletProps): React.ReactElement {
         <Checkbox
           disableRipple
           icon={checkedNeutral}
-          checkedIcon={modletState.modlet.isValidXML() ? checkedOK : checkedFAIL}
+          checkedIcon={modletState.errors.length === 0 ? checkedOK : checkedFAIL}
           checked={modletState.validated}
           onChange={() => props.handleValidation(modletState)}
           className={classes.checkbox}
         />
       }
-      label={modletState.validated ? (modletState.modlet.isValidXML() ? "Valid" : "Errors") : "Validate"}
+      label={modletState.validated ? (modletState.errors.length === 0 ? "Valid" : "Errors") : "Validate"}
     />
   );
 
@@ -151,7 +151,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
         if (modletLocal) throw new Error(`Error: Will not remove original modlet ${modletInstallPath}`);
 
         if (!fileExists(modletInstallPath) || !fs.statSync(modletInstallPath).isDirectory())
-          throw new Error(`Error: ${modletState.modlet.modInfo.folder} is not installed`);
+          throw new Error(`Error: ${modletState.modlet.modInfo.folderName} is not installed`);
 
         fs.unlinkSync(modletInstallPath);
       } catch (err) {
@@ -190,7 +190,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
 
   const errorBlock = (
     <ul>
-      {modletState.modlet.errors().map((error, index) => (
+      {modletState.errors.map((error, index) => (
         <li key={index}>
           <Typography className={classes.validationErrors} variant="body2" color="textSecondary">
             {error}
@@ -207,7 +207,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
         <Typography className={classes.description} variant="body2" color="textSecondary">
           {modletData.description}
         </Typography>
-        {!modletState.modlet.isValid() && errorBlock}
+        {modletState.errors.length !== 0 && errorBlock}
       </TableCell>
       <TableCell>
         <Typography>{modletData.author}</Typography>

@@ -63,8 +63,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Modlets(props: ModletsProps): React.ReactElement {
-  let modletList: React.ReactNode[] | React.ReactNode;
-
   const { state, stateDispatch } = props;
   const [noModsButton, setNoModsButton] = useState(<span />);
   const [validating, setValidating] = useState(false);
@@ -73,13 +71,14 @@ function Modlets(props: ModletsProps): React.ReactElement {
   const modsPath = state.config.gameFolder ? path.win32.normalize(path.join(state.config.gameFolder, "Mods")) : "";
 
   const handleValidation = async (modletState: IModletState) => {
-    await modletState.modlet.validate(state.config.gameFolder);
-    stateDispatch({ type: "syncModlets", payload: { ...modletState, validated: true } });
+    let errors = [];
+    if (state.gameXML) {
+      errors = await state.gameXML.validate(modletState.modlet);
+      stateDispatch({ type: "syncModlets", payload: { ...modletState, validated: true, errors: errors } });
+    }
   };
 
   const handleValidateAll = () => {
-    let result = Promise.resolve();
-
     setValidating(true);
     setValidateButtonLabel("Validating");
 
@@ -88,13 +87,14 @@ function Modlets(props: ModletsProps): React.ReactElement {
         state.modlets.map((modletState: IModletState) => {
           // This runs the promises in single-order, so that they can dispatch between runs.
           // I still can't get the page to update fast enough, but that's a problem for another day.
-          return (result = result.then(() => handleValidation(modletState)));
+          return handleValidation(modletState);
         })
       ).then(() => {
+        if (state.gameXML) state.gameXML.reset();
         setValidateButtonLabel("Validate XMLs");
         setValidating(false);
       });
-    }, 500); // necessary for the button to update
+    }, 500);
   };
 
   const modletsListBasic = (): React.ReactNode => {
@@ -162,7 +162,11 @@ function Modlets(props: ModletsProps): React.ReactElement {
     );
   };
 
-  modletList = state.modlets.length ? (state.advancedMode ? modletsListAdvanced() : modletsListBasic()) : noModlets();
+  const modletList = state.modlets.length
+    ? state.advancedMode
+      ? modletsListAdvanced()
+      : modletsListBasic()
+    : noModlets();
 
   useEffect(() => {
     const createModsFolder = () => {
