@@ -41,7 +41,7 @@ const template = commands => [
         label: "Learn More",
         click: async () => {
           const { shell } = require("electron");
-          await shell.openExternal("https://github.com/dyoung522/7d2d-modlet-manager/wiki");
+          await shell.openExternal("https://gitlab.com/dyoung522/7d2d-modlet-manager/wikis/home");
         }
       }
     ]

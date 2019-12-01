@@ -4,5 +4,5 @@ import Modlets from ".";
 import mock_state from "test_helpers/mock_state";
 
 it("renders without crashing", () => {
-  shallow(<Modlets state={mock_state} />);
+  shallow(<Modlets state={mock_state} stateDispatch={jest.fn()} />);
 });
