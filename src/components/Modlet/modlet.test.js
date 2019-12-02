@@ -4,12 +4,16 @@ import Modlet from ".";
 import createMockModlet from "test_helpers/mock_modlet";
 import mock_state from "test_helpers/mock_state";
 
-let modlet;
+let modletState;
 let component;
 
 describe("Modlet", () => {
   beforeEach(() => {
-    modlet = createMockModlet();
+    modletState = {
+      modlet: createMockModlet(),
+      validated: false,
+      errors: []
+    };
   });
 
   afterEach(() => {
@@ -19,7 +23,7 @@ describe("Modlet", () => {
   describe("Basic Mode", () => {
     beforeEach(() => {
       mock_state.advancedMode = false;
-      component = shallow(<Modlet state={mock_state} modlet={modlet} />);
+      component = shallow(<Modlet state={mock_state} modletState={modletState} handleValidation={jest.fn()} />);
     });
 
     it("should render correctly", () => {
@@ -30,7 +34,7 @@ describe("Modlet", () => {
   describe("Advanced Mode", () => {
     beforeEach(() => {
       mock_state.advancedMode = true;
-      component = shallow(<Modlet state={mock_state} modlet={modlet} />);
+      component = shallow(<Modlet state={mock_state} modletState={modletState} handleValidation={jest.fn()} />);
     });
 
     it("should render correctly", () => {

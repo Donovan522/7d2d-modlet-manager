@@ -10,17 +10,16 @@ import List from "@material-ui/core/List";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import Switch from "@material-ui/core/Switch";
 import LaunchIcon from "@material-ui/icons/Launch";
+import { execFile } from "child_process";
+import { remote } from "electron";
 import FolderPicker from "components/FolderPicker";
 import Modlets from "components/Modlets";
-import { remote } from "electron";
-import isDev from "electron-is-dev";
-import { getModlets, GameXML, fileExists } from "helpers";
+import { fileExists, GameXML, getModlets } from "helpers";
 import theme from "helpers/theme";
 import menuTemplate from "menu";
 import path from "path";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { hot } from "react-hot-loader";
-import { execFile } from "child_process";
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
@@ -87,8 +86,6 @@ function App(props: AppProps): React.ReactElement {
   const sortModlets = (a: IModletState, b: IModletState) => (a.modlet.get("name") > b.modlet.get("name") ? 1 : -1);
 
   const stateReducer = (state: IState, action: { type: string; payload?: any }): IState => {
-    if (isDev) console.log("Dispatch received:", action);
-
     switch (action.type) {
       case "setAdvancedMode":
         props.store.set("mode", action.payload ? 1 : 0);
@@ -148,7 +145,6 @@ function App(props: AppProps): React.ReactElement {
         };
 
       default:
-        if (isDev) console.warn("Dispatch called with invalid type", action.type);
         return state;
     }
   };

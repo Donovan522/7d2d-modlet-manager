@@ -1,6 +1,5 @@
 import { Modlet } from "helpers";
 import createMockModlet from "test_helpers/mock_modlet";
-import fs from "fs";
 import mock_fs from "mock-fs";
 
 let modlet;
@@ -69,8 +68,12 @@ it("should be disabled when modinfo is prefixed with 'disabled'", () => {
   expect(modlet.isEnabled()).toBe(false);
 });
 
+it("should return the modlet directory", () => {
+  expect(modlet.modInfo.folderPath).toEqual("/foo/bar/bat");
+});
+
 it("should return the modlet directory name", () => {
-  expect(modlet.modInfo.folder).toEqual("bat");
+  expect(modlet.modInfo.folderName).toEqual("bat");
 });
 
 /*

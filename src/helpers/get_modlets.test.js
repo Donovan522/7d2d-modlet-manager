@@ -4,6 +4,11 @@ import mock_fs from "mock-fs";
 import createMockModlet from "test_helpers/mock_modlet";
 
 const mockModlet = createMockModlet();
+const mockModletState = {
+  modlet: mockModlet,
+  validated: false,
+  errors: []
+};
 
 jest.genMockFromModule("helpers/modlet-class");
 jest.mock("helpers/modlet-class");
@@ -31,5 +36,5 @@ afterAll(() => mock_fs.restore());
 it("returns an empty array when no searchFolder provided", () => expect(getModlets(null)).toEqual([]));
 
 it("returns an array of Modlet instances", () => {
-  expect(getModlets("/foo/bar")).toEqual([mockModlet]);
+  expect(getModlets("/foo/bar")).toEqual([mockModletState]);
 });
