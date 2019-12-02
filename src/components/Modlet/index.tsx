@@ -144,7 +144,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
     });
   };
 
-  const handleInstallClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInstallClick = () => {
     if (installed) {
       setInstalled(false);
       try {

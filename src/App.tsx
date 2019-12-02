@@ -76,7 +76,7 @@ function App(props: AppProps): React.ReactElement {
     modlets: []
   };
 
-  const initState = (state: IState): IState => ({
+  const initState = (): IState => ({
     advancedMode: !!parseInt(props.store.get("mode")),
     config: props.store.store,
     gameXML: props.store.get("gameFolder") ? new GameXML(props.store.get("gameFolder")) : null,
@@ -87,15 +87,16 @@ function App(props: AppProps): React.ReactElement {
 
   const stateReducer = (state: IState, action: { type: string; payload?: any }): IState => {
     switch (action.type) {
-      case "setAdvancedMode":
+      case "setAdvancedMode": {
         props.store.set("mode", action.payload ? 1 : 0);
 
         return {
           ...state,
           advancedMode: action.payload
         };
+      }
 
-      case "setGameFolder":
+      case "setGameFolder": {
         props.store.set("gameFolder", action.payload);
 
         return {
@@ -103,8 +104,9 @@ function App(props: AppProps): React.ReactElement {
           config: { ...props.store.store, gameFolder: action.payload },
           gameXML: new GameXML(action.payload)
         };
+      }
 
-      case "setModletFolder":
+      case "setModletFolder": {
         props.store.set("modletFolder", action.payload);
 
         return {
@@ -112,20 +114,23 @@ function App(props: AppProps): React.ReactElement {
           config: { ...props.store.store, modletFolder: action.payload },
           modlets: getModlets(action.payload)
         };
+      }
 
-      case "setModlets":
+      case "setModlets": {
         return {
           ...state,
           modlets: action.payload.sort(sortModlets)
         };
+      }
 
-      case "clearModlets":
+      case "clearModlets": {
         return {
           ...state,
           modlets: []
         };
+      }
 
-      case "syncModlets":
+      case "syncModlets": {
         const modletState = state.modlets.filter((obj: IModletState) => obj.modlet === action.payload.modlet)[0];
 
         if (!modletState) throw new Error("syncModlets dispatch received invalid modlet");
@@ -137,12 +142,14 @@ function App(props: AppProps): React.ReactElement {
           ...state,
           modlets: [...modletStates, newModletState].sort(sortModlets)
         };
+      }
 
-      case "setGameXML":
+      case "setGameXML": {
         return {
           ...state,
           gameXML: new GameXML(state.config.gameFolder)
         };
+      }
 
       default:
         return state;
