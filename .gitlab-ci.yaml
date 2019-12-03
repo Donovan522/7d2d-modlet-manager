@@ -11,7 +11,6 @@ cache:
 stages:
   - setup
   - test
-  - build
 
 install_modules:
   stage: setup
@@ -37,13 +36,3 @@ test:
   script:
     - echo "Running tests"
     - yarn run test
-
-build:
-  stage: build
-  dependencies:
-    - install_modules
-  script:
-    - echo "Building EXE"
-    - yarn dist
-  only:
-    - master
