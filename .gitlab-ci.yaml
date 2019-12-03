@@ -1,0 +1,49 @@
+image: node:latest
+
+include:
+  template: Jobs/Code-Quality.gitlab-ci.yml
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - node_modules/
+
+stages:
+  - setup
+  - test
+  - build
+
+install_modules:
+  stage: setup
+  script:
+    - echo "Installing dependencies"
+    - yarn
+  artifacts:
+    untracked: true
+    expire_in: 1 week
+
+lint:
+  stage: test
+  dependencies:
+    - install_modules
+  script:
+    - echo "Linting"
+    - yarn run lint
+
+test:
+  stage: test
+  dependencies:
+    - install_modules
+  script:
+    - echo "Running tests"
+    - yarn run test
+
+build:
+  stage: build
+  dependencies:
+    - install_modules
+  script:
+    - echo "Building EXE"
+    - yarn dist
+  only:
+    - master
