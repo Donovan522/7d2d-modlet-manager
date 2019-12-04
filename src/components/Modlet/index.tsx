@@ -97,7 +97,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
             icon={checkedNeutral}
             checkedIcon={checkedOK}
             checked={installed}
-            onChange={e => handleInstallClick(e)}
+            onChange={() => handleInstallClick()}
             className={classes.checkbox}
           />
         }
@@ -144,7 +144,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
     });
   };
 
-  const handleInstallClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInstallClick = () => {
     if (installed) {
       setInstalled(false);
       try {

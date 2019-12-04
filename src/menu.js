@@ -1,6 +1,9 @@
 import path from "path";
 import { aboutMenuItem } from "electron-util";
 
+const iconPath = path.join("public", "favicon.ico");
+console.log("Icon Path:", iconPath);
+
 const template = commands => [
   {
     label: "File",
@@ -33,7 +36,7 @@ const template = commands => [
     role: "Help",
     submenu: [
       aboutMenuItem({
-        icon: path.join(__dirname, "static/Icon.png"),
+        icon: iconPath,
         copyright: "Copyright © Donovan C. Young",
         text: "7 Days to Die Modlet Manager"
       }),

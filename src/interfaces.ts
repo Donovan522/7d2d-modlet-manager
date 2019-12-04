@@ -1,3 +1,4 @@
+/* eslint-disable */
 // @ts-ignore
 abstract class Modlet {
   abstract modInfo: { [index in "file" | "folderName" | "folderPath"]: string };
