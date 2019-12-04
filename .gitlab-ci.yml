@@ -1,0 +1,44 @@
+image: node:latest
+
+include:
+  template: Jobs/Code-Quality.gitlab-ci.yml
+
+cache:
+  paths:
+    - node_modules/
+
+stages:
+  - setup
+  - test
+  - build
+
+install_modules:
+  stage: setup
+  script:
+    - yarn install
+
+lint:
+  stage: test
+  dependencies:
+    - install_modules
+  script:
+    - yarn lint
+
+test:
+  stage: test
+  dependencies:
+    - install_modules
+  script:
+    - yarn test
+
+build:
+  image: slauta93/electron-builder-win
+  stage: build
+  only:
+    - master
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/dist/*.*
+  script:
+    - sed -r -i "/\"version\":/s/([[:digit:]]+.[[:digit:]]+.[[:digit:]]+)/\1.${CI_PIPELINE_ID}/" package.json
+    - yarn && yarn build
