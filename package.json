@@ -38,7 +38,7 @@
       "node_modules/**/*"
     ],
     "directories": {
-      "buildResources": "assets"
+      "buildResources": "build"
     },
     "publish": {
       "provider": "github"
