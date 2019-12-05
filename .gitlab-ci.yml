@@ -3,8 +3,14 @@ image: node:12
 include:
   template: Jobs/Code-Quality.gitlab-ci.yml
 
+variables:
+  GIT_LFS_SKIP_SMUDGE: "1"
+  NODE_ENV: development
+  NODE_PATH: .
+
 cache:
-  key: ${CI_COMMIT_REF_SLUG}
+  untracked: true
+  key: "$CI_BUILD_REF_NAME"
   paths:
     - node_modules/
 
@@ -13,28 +19,24 @@ stages:
   - test
   - build
 
-install_modules:
+setup:
   stage: setup
   script:
     - yarn install
 
 lint:
   stage: test
-  dependencies:
-    - install_modules
   script:
-    - yarn lint
+    - yarn && yarn lint
 
 test:
   stage: test
-  dependencies:
-    - install_modules
   script:
-    - yarn test
+    - yarn && yarn test
 
 build:
-  image: slauta93/electron-builder-win
   stage: build
+  image: slauta93/electron-builder-win
   only:
     - master
   artifacts:
@@ -42,4 +44,4 @@ build:
       - $CI_PROJECT_DIR/dist/*.*
   script:
     - sed -r -i "/\"version\":/s/([[:digit:]]+.[[:digit:]]+.[[:digit:]]+)/\1.${CI_PIPELINE_ID}/" package.json
-    - yarn && yarn build
+    - yarn && yarn dist

@@ -1,6 +1,7 @@
+import "enzyme";
 import { configure } from "enzyme";
-import mock_console from "test_helpers/mock_console";
 import Adapter from "enzyme-adapter-react-16";
+import mock_console from "test_helpers/mock_console";
 
 configure({ adapter: new Adapter() });
 
