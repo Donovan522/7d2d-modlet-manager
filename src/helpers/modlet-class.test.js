@@ -1,9 +1,10 @@
 import { Modlet } from "helpers";
 import createMockModlet from "test_helpers/mock_modlet";
 import mock_fs from "mock-fs";
+import path from "path";
 
 let modlet;
-const modInfoPath = "/foo/bar/bat/ModInfo.xml";
+const modInfoPath = path.normalize("/foo/bar/bat/ModInfo.xml");
 
 beforeAll(() => {
   mock_fs({
@@ -61,7 +62,7 @@ it("should be enabled by default", () => {
 });
 
 it("should be disabled when modinfo is prefixed with 'disabled'", () => {
-  const modinfoPath = "/foo/bar/bat/disabled-modinfo.xml";
+  const modinfoPath = path.normalize("/foo/bar/bat/disabled-modinfo.xml");
   const modlet = new Modlet(modinfoPath);
 
   expect(modlet.modInfo.file).toEqual(modinfoPath);
@@ -69,7 +70,7 @@ it("should be disabled when modinfo is prefixed with 'disabled'", () => {
 });
 
 it("should return the modlet directory", () => {
-  expect(modlet.modInfo.folderPath).toEqual("/foo/bar/bat");
+  expect(modlet.modInfo.folderPath).toEqual(path.normalize("/foo/bar/bat"));
 });
 
 it("should return the modlet directory name", () => {
