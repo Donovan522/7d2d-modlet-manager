@@ -10,6 +10,7 @@
 
 # production
 /build
+/builds
 /stash
 /private
 
