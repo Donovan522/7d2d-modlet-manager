@@ -1,5 +1,5 @@
 import fs from "fs";
-import { fileExists } from "helpers";
+import { fileExists } from "src/helpers";
 import path from "path";
 import { Parser } from "xml2js";
 

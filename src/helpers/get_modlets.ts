@@ -1,5 +1,5 @@
 import fs from "fs";
-import { fileExists, Modlet } from "helpers";
+import { fileExists, Modlet } from "src/helpers";
 import path from "path";
 
 export default function getModlets(searchFolder: string): IModletState[] {

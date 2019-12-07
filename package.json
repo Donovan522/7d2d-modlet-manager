@@ -93,11 +93,6 @@
       "jsdom-quokka-plugin"
     ]
   },
-  "jest": {
-    "moduleNameMapper": {
-      "^(components|helpers|test_helpers)/(.*)$": "<rootDir>/src/$1/$2"
-    }
-  },
   "dependencies": {
     "@material-ui/core": "^4.5.1",
     "@material-ui/icons": "^4.5.1",

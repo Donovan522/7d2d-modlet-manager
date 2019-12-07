@@ -9,9 +9,6 @@ cache:
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
 
-before_install:
-  - nvm install 12.13.1
-
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 

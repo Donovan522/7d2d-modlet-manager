@@ -1,7 +1,7 @@
 import { shallow } from "enzyme";
-import App from "App";
+import App from "./App";
 import React from "react";
-import mock_store from "test_helpers/mock_store";
+import mock_store from "src/test_helpers/mock_store";
 
 jest.mock("electron", () => ({
   remote: {
