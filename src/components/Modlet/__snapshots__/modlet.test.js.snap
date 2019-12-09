@@ -1,5 +1,230 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Modlet Advanced Mode should render correctly 1`] = `ShallowWrapper {}`;
+exports[`Modlet Advanced Mode should render correctly 1`] = `
+<DocumentFragment>
+  <tr
+    class="MuiTableRow-root"
+  >
+    <td
+      class="MuiTableCell-root"
+    >
+      <p
+        class="MuiTypography-root MuiTypography-body1"
+      >
+        unknown
+      </p>
+      <p
+        class="MuiTypography-root makeStyles-description-121 MuiTypography-body2 MuiTypography-colorTextSecondary"
+      >
+        unknown
+      </p>
+    </td>
+    <td
+      class="MuiTableCell-root"
+    >
+      <p
+        class="MuiTypography-root MuiTypography-body1"
+      >
+        unknown
+      </p>
+    </td>
+    <td
+      class="MuiTableCell-root MuiTableCell-alignRight"
+    >
+      <p
+        class="MuiTypography-root MuiTypography-body1"
+      >
+        unknown
+      </p>
+      <p
+        class="MuiTypography-root makeStyles-italic-120 MuiTypography-body2 MuiTypography-colorTextSecondary"
+      >
+        unknown
+      </p>
+    </td>
+    <td
+      class="MuiTableCell-root"
+    >
+      <div
+        class="MuiBox-root MuiBox-root-174 makeStyles-box-117"
+      >
+        <label
+          class="MuiFormControlLabel-root"
+        >
+          <span
+            aria-disabled="false"
+            class="MuiButtonBase-root MuiIconButton-root PrivateSwitchBase-root-187 MuiCheckbox-root MuiCheckbox-colorSecondary makeStyles-checkbox-124 MuiIconButton-colorSecondary"
+          >
+            <span
+              class="MuiIconButton-label"
+            >
+              <input
+                class="PrivateSwitchBase-input-190"
+                data-indeterminate="false"
+                type="checkbox"
+                value=""
+              />
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root"
+                focusable="false"
+                role="presentation"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"
+                />
+              </svg>
+            </span>
+          </span>
+          <span
+            class="MuiTypography-root MuiFormControlLabel-label MuiTypography-body1"
+          >
+            Not Installed
+          </span>
+        </label>
+        <label
+          class="MuiFormControlLabel-root"
+        >
+          <span
+            aria-disabled="false"
+            class="MuiButtonBase-root MuiIconButton-root PrivateSwitchBase-root-187 MuiCheckbox-root MuiCheckbox-colorSecondary makeStyles-checkbox-124 PrivateSwitchBase-checked-188 Mui-checked MuiIconButton-colorSecondary"
+          >
+            <span
+              class="MuiIconButton-label"
+            >
+              <input
+                checked=""
+                class="PrivateSwitchBase-input-190"
+                data-indeterminate="false"
+                type="checkbox"
+                value=""
+              />
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root makeStyles-iconOK-122"
+                focusable="false"
+                role="presentation"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                />
+              </svg>
+            </span>
+          </span>
+          <span
+            class="MuiTypography-root MuiFormControlLabel-label MuiTypography-body1"
+          >
+            Enabled
+          </span>
+        </label>
+        <label
+          class="MuiFormControlLabel-root"
+        >
+          <span
+            aria-disabled="false"
+            class="MuiButtonBase-root MuiIconButton-root PrivateSwitchBase-root-187 MuiCheckbox-root MuiCheckbox-colorSecondary makeStyles-checkbox-124 MuiIconButton-colorSecondary"
+          >
+            <span
+              class="MuiIconButton-label"
+            >
+              <input
+                class="PrivateSwitchBase-input-190"
+                data-indeterminate="false"
+                type="checkbox"
+                value=""
+              />
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root"
+                focusable="false"
+                role="presentation"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"
+                />
+              </svg>
+            </span>
+          </span>
+          <span
+            class="MuiTypography-root MuiFormControlLabel-label MuiTypography-body1"
+          >
+            Validate
+          </span>
+        </label>
+      </div>
+    </td>
+  </tr>
+</DocumentFragment>
+`;
 
-exports[`Modlet Basic Mode should render correctly 1`] = `ShallowWrapper {}`;
+exports[`Modlet Basic Mode should render correctly 1`] = `
+<DocumentFragment>
+  <div
+    class="MuiPaper-root MuiPaper-elevation1 MuiCard-root makeStyles-root-1 MuiPaper-rounded"
+  >
+    <div
+      class="MuiCardContent-root"
+    >
+      <p
+        class="MuiTypography-root MuiTypography-body1"
+      >
+        unknown
+      </p>
+      <p
+        class="MuiTypography-root makeStyles-description-6 MuiTypography-body2 MuiTypography-colorTextSecondary"
+      >
+        unknown
+      </p>
+    </div>
+    <div
+      class="MuiCardActions-root MuiCardActions-spacing"
+    >
+      <div
+        class="MuiTypography-root makeStyles-cardVersion-3 MuiTypography-caption MuiTypography-colorTextSecondary"
+      >
+        By unknown - vunknown 
+      </div>
+      <label
+        class="MuiFormControlLabel-root makeStyles-enableControl-4 MuiFormControlLabel-labelPlacementStart"
+      >
+        <span
+          class="MuiSwitch-root MuiSwitch-sizeSmall"
+        >
+          <span
+            aria-disabled="false"
+            class="MuiButtonBase-root MuiIconButton-root PrivateSwitchBase-root-90 MuiSwitch-switchBase MuiSwitch-colorSecondary PrivateSwitchBase-checked-91 Mui-checked"
+          >
+            <span
+              class="MuiIconButton-label"
+            >
+              <input
+                checked=""
+                class="PrivateSwitchBase-input-93 MuiSwitch-input"
+                type="checkbox"
+                value=""
+              />
+              <span
+                class="MuiSwitch-thumb"
+              />
+            </span>
+            <span
+              class="MuiTouchRipple-root"
+            />
+          </span>
+          <span
+            class="MuiSwitch-track"
+          />
+        </span>
+        <span
+          class="MuiTypography-root MuiFormControlLabel-label MuiTypography-body1"
+        >
+          Enabled
+        </span>
+      </label>
+    </div>
+  </div>
+</DocumentFragment>
+`;

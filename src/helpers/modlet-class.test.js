@@ -1,5 +1,5 @@
-import { Modlet } from "src/helpers";
-import createMockModlet from "src/test_helpers/mock_modlet";
+import { Modlet } from "helpers";
+import createMockModlet from "test_helpers/mock_modlet";
 import mock_fs from "mock-fs";
 import path from "path";
 

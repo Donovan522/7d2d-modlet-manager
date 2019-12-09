@@ -15,7 +15,7 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import RadioButtonUncheckedIcon from "@material-ui/icons/RadioButtonUnchecked";
 import { remote } from "electron";
 import fs from "fs";
-import { fileExists } from "src/helpers";
+import { fileExists } from "helpers";
 import path from "path";
 import PropTypes from "prop-types";
 import React, { useState } from "react";

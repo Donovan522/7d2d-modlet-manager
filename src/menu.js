@@ -2,8 +2,6 @@ import path from "path";
 import { aboutMenuItem } from "electron-util";
 
 const iconPath = path.join("public", "favicon.ico");
-console.log("Icon Path:", iconPath);
-
 const template = commands => [
   {
     label: "File",

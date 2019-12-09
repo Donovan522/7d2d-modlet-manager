@@ -12,10 +12,10 @@ import Switch from "@material-ui/core/Switch";
 import LaunchIcon from "@material-ui/icons/Launch";
 import { execFile } from "child_process";
 import { remote } from "electron";
-import FolderPicker from "src/components/FolderPicker";
-import Modlets from "src/components/Modlets";
-import { fileExists, GameXML, getModlets } from "src/helpers";
-import theme from "src/helpers/theme";
+import FolderPicker from "components/FolderPicker";
+import Modlets from "components/Modlets";
+import { fileExists, GameXML, getModlets } from "helpers";
+import theme from "helpers/theme";
 import menuTemplate from "./menu";
 import path from "path";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
@@ -303,7 +303,7 @@ function App(props: AppProps): React.ReactElement {
               folder={state.config.gameFolder}
               handleClick={getGameFolder}
               label="Game Folder"
-              tooltip="Click to select Game Folder"
+              toolTip="Click to select Game Folder"
             />
             <Collapse in={state.advancedMode}>
               <FolderPicker
@@ -311,7 +311,7 @@ function App(props: AppProps): React.ReactElement {
                 folder={state.config.modletFolder}
                 handleClick={getModletFolder}
                 label="Modlet Folder"
-                tooltip="Click to select Modlet folder"
+                toolTip="Click to select Modlet folder"
               />
             </Collapse>
           </List>

@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders without crashing 1`] = `
+<DocumentFragment>
+  <div
+    class="MuiGrid-root makeStyles-root-7 MuiGrid-container MuiGrid-spacing-xs-2"
+  >
+    <div
+      class="MuiGrid-root makeStyles-cardEmpty-3 MuiGrid-item"
+    >
+      <h6
+        class="MuiTypography-root makeStyles-noModletsHeader-4 MuiTypography-h6"
+      >
+        No Modlets Installed
+      </h6>
+      <hr
+        class="MuiDivider-root MuiDivider-middle"
+      />
+      <p
+        class="MuiTypography-root makeStyles-noModletsBody-5 MuiTypography-body1"
+      >
+        To install mods, place them in \\foo\\bar\\Mods
+        <span />
+      </p>
+    </div>
+  </div>
+</DocumentFragment>
+`;

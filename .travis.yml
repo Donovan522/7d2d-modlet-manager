@@ -15,7 +15,8 @@ before_cache:
 jobs:
   include:
     - stage: test
-      script: yarn && yarn test
+      script: yarn test
+
     - stage: build
       services: docker
       language: generic

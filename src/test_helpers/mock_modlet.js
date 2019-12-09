@@ -1,5 +1,5 @@
 import fs from "fs";
-import { Modlet } from "src/helpers";
+import { Modlet } from "helpers";
 
 function mkModInfo(type) {
   const versionData = {

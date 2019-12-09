@@ -1,7 +1,11 @@
 import React from "react";
-import { shallow } from "enzyme";
 import FolderPicker from ".";
+import { render } from "@testing-library/react";
 
 it("renders without crashing", () => {
-  shallow(<FolderPicker advancedMode={false} folder={"/foo/bar"} handleClick={jest.fn()} label={"foo"} />);
+  const { asFragment } = render(
+    <FolderPicker advancedMode={false} folder={"/foo/bar"} handleClick={jest.fn()} label={"foo"} toolTip={"bar"} />
+  );
+
+  expect(asFragment()).toMatchSnapshot();
 });

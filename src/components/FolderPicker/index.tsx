@@ -16,7 +16,7 @@ interface IFolderPickerProps {
   folder: string;
   handleClick: (event: React.MouseEvent | null) => void;
   label: string;
-  tooltip: string | undefined;
+  toolTip: string;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -38,7 +38,7 @@ function FolderPicker(props: IFolderPickerProps): React.ReactElement {
 
   return (
     <Tooltip
-      title={props.tooltip}
+      title={props.toolTip}
       color="secondary"
       placement="top-start"
       enterDelay={500}
@@ -68,7 +68,7 @@ FolderPicker.propTypes = {
   folder: PropTypes.string.isRequired,
   handleClick: PropTypes.func.isRequired,
   label: PropTypes.string.isRequired,
-  tooltip: PropTypes.string
+  toolTip: PropTypes.string.isRequired
 };
 
 export default FolderPicker;

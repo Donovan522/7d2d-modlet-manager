@@ -1,7 +1,6 @@
-import Enzyme from "enzyme";
-import Adapter from "enzyme-adapter-react-16";
-import mock_console from "src/test_helpers/mock_console";
-
-Enzyme.configure({ adapter: new Adapter() });
+// react-testing-library renders your components to document.body,
+// this adds jest-dom's custom assertions
+import "@testing-library/jest-dom/extend-expect";
+import mock_console from "test_helpers/mock_console";
 
 global.console = mock_console; // mock-fs is unable to handle console.log output

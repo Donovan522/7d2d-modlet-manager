@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "src",
     "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -16,5 +16,7 @@
     "noEmit": true,
     "jsx": "react"
   },
-  "include": ["src", "src/index.js", "public/electron.js", "src/interfaces.ts"]
+  "files": ["public/electron.js"],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.test.js"]
 }

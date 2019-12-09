@@ -1,7 +1,7 @@
 import getModlets from "./get_modlets";
-import Modlet from "src/helpers/modlet-class";
+import Modlet from "helpers/modlet-class";
 import mock_fs from "mock-fs";
-import createMockModlet from "src/test_helpers/mock_modlet";
+import createMockModlet from "test_helpers/mock_modlet";
 
 const mockModlet = createMockModlet();
 const mockModletState = {
@@ -10,8 +10,8 @@ const mockModletState = {
   errors: []
 };
 
-jest.genMockFromModule("src/helpers/modlet-class");
-jest.mock("src/helpers/modlet-class");
+jest.genMockFromModule("helpers/modlet-class");
+jest.mock("helpers/modlet-class");
 
 Modlet.mockImplementation(() => mockModlet);
 

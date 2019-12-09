@@ -1,7 +1,7 @@
-import { shallow } from "enzyme";
-import App from "./App";
+import App from "App";
 import React from "react";
-import mock_store from "src/test_helpers/mock_store";
+import mock_store from "test_helpers/mock_store";
+import { render } from "@testing-library/react";
 
 jest.mock("electron", () => ({
   remote: {
@@ -17,5 +17,7 @@ jest.mock("electron-util", () => ({
 }));
 
 it("renders without crashing", () => {
-  shallow(<App store={mock_store} />);
+  const { asFragment } = render(<App store={mock_store} />);
+
+  expect(asFragment()).toMatchSnapshot();
 });
