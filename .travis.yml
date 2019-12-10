@@ -15,7 +15,7 @@ before_cache:
 jobs:
   include:
     - stage: test
-      script: yarn test
+      script: npm test
 
     - stage: build
       services: docker

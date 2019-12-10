@@ -50,16 +50,16 @@
   },
   "main": "public/electron.js",
   "scripts": {
-    "dev": "concurrently -k \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron --inspect .\"",
+    "dev": "concurrently -k \"cross-env BROWSER=none npm run start\" \"wait-on http://localhost:3000 && electron --inspect .\"",
     "start": "rescripts start",
     "build": "rescripts build",
-    "test": "react-scripts test",
+    "test": "rescripts test",
     "test-coverage": "rescripts test --coverage",
-    "dist": "yarn build; electron-builder -w",
+    "dist": "npm run build; electron-builder -w",
     "pack": "electron-builder -w --dir",
-    "release": "yarn build; electron-builder -w -p 'onTagOrDraft'",
+    "release": "npm run build; electron-builder -w -p 'onTagOrDraft'",
     "postinstall": "electron-builder install-app-deps",
-    "preelectron-pack": "yarn build",
+    "preelectron-pack": "npm run build",
     "lint": "eslint src --ext .ts --ext .tsx"
   },
   "eslintConfig": {
@@ -95,13 +95,12 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "^(components|helpers|test_helpers)/(.*)$": "<rootDir>/src/$1/$2"
+      "^@src/(.*)$": "<rootDir>/src/$1"
     }
   },
   "dependencies": {
     "@material-ui/core": "^4.5.1",
     "@material-ui/icons": "^4.5.1",
-    "clsx": "^1.0.4",
     "electron-debug": "^3.0.1",
     "electron-is-dev": "^1.1.0",
     "electron-react-devtools": "^0.5.3",
@@ -109,7 +108,6 @@
     "electron-unhandled": "^3.0.1",
     "electron-util": "^0.13.0",
     "electron-window-state": "^5.0.3",
-    "jss-plugin-rule-value-function": "^10.0.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-jss": "^10.0.0",
