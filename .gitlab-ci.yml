@@ -22,17 +22,17 @@ stages:
 setup:
   stage: setup
   script:
-    - yarn install
+    - npm install
 
 lint:
   stage: test
   script:
-    - yarn && yarn lint
+    - npm lint
 
 test:
   stage: test
   script:
-    - yarn && yarn test
+    - npm test
 
 build:
   stage: build
@@ -44,4 +44,4 @@ build:
       - $CI_PROJECT_DIR/dist/*.*
   script:
     - sed -r -i "/\"version\":/s/([[:digit:]]+.[[:digit:]]+.[[:digit:]]+)/\1.${CI_PIPELINE_ID}/" package.json
-    - yarn && yarn dist
+    - npm dist

@@ -1,10 +1,12 @@
 export default {
   advancedMode: false,
   config: {
-    gameFolder: "/foo/bar",
-    modletFolder: "/foo/bar/Mods",
-    mode: 0
+    get: jest.fn(),
+    set: jest.fn(),
+    store: {}
   },
+  gameFolder: "/foo/bar",
   gameXML: {},
+  modletFolder: "/foo/bar/Mods",
   modlets: []
 };

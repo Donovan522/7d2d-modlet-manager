@@ -17,7 +17,7 @@ jest.mock("electron-util", () => ({
 }));
 
 it("renders without crashing", () => {
-  const { asFragment } = render(<App store={mock_store} />);
+  const { asFragment } = render(<App config={mock_store} />);
 
   expect(asFragment()).toMatchSnapshot();
 });

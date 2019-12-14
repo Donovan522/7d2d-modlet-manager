@@ -178,7 +178,7 @@ exports[`renders without crashing 1`] = `
           <p
             class="MuiTypography-root makeStyles-noModletsBody-145 MuiTypography-body1"
           >
-            To install mods, place them in C:\\Steam\\SteamLibrary\\steamapps\\common\\7 Day to Die\\Mods
+            To install mods, place them in 
             <span />
           </p>
         </div>

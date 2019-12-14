@@ -28,7 +28,9 @@ interface IStore {
 
 interface IState {
   advancedMode: boolean;
-  config: IStore;
+  config: any;
+  gameFolder: string;
   gameXML: GameXML | null;
+  modletFolder: string;
   modlets: IModletState[];
 }

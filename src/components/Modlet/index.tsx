@@ -72,7 +72,7 @@ function ModletComponent(props: ModletProps): React.ReactElement {
   const { modletState, state } = props;
 
   const modletDir = path.win32.normalize(path.dirname(modletState.modlet.modInfo.file));
-  const modletInstallPath = path.win32.normalize(path.join(state.config.gameFolder, "Mods", path.basename(modletDir)));
+  const modletInstallPath = path.win32.normalize(path.join(state.gameFolder, "Mods", path.basename(modletDir)));
   const modletLocal = modletDir === modletInstallPath;
 
   const classes = useStyles();

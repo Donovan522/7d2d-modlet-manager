@@ -11,15 +11,16 @@ import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import Switch from "@material-ui/core/Switch";
 import LaunchIcon from "@material-ui/icons/Launch";
 import { execFile } from "child_process";
-import { remote } from "electron";
 import FolderPicker from "components/FolderPicker";
 import Modlets from "components/Modlets";
-import { fileExists, GameXML, getModlets } from "helpers";
+import { remote } from "electron";
+import { fileExists, getModlets } from "helpers";
+import stateReducer from "helpers/state";
 import theme from "helpers/theme";
-import menuTemplate from "./menu";
 import path from "path";
-import React, { useCallback, useEffect, useReducer, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { hot } from "react-hot-loader";
+import menuTemplate from "./menu";
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
@@ -56,107 +57,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface AppProps {
-  store: any;
+  config: any;
 }
 
-function App(props: AppProps): React.ReactElement {
+function App({ config }: AppProps): React.ReactElement {
   const classes = useStyles();
   const gameExecutable = "7DaysToDie.exe";
   // const gameExecutableEAC = "7DaysToDie_EAC.exe";
   const [loading, setLoading] = useState(false);
-
-  const initialState: IState = {
-    advancedMode: false,
-    config: {
-      gameFolder: "",
-      modletFolder: "",
-      mode: 0
-    },
-    gameXML: null,
-    modlets: []
-  };
-
-  const initState = (): IState => ({
-    advancedMode: !!parseInt(props.store.get("mode")),
-    config: props.store.store,
-    gameXML: props.store.get("gameFolder") ? new GameXML(props.store.get("gameFolder")) : null,
-    modlets: []
-  });
-
-  const sortModlets = (a: IModletState, b: IModletState) => (a.modlet.get("name") > b.modlet.get("name") ? 1 : -1);
-
-  const stateReducer = (state: IState, action: { type: string; payload?: any }): IState => {
-    switch (action.type) {
-      case "setAdvancedMode": {
-        props.store.set("mode", action.payload ? 1 : 0);
-
-        return {
-          ...state,
-          advancedMode: action.payload
-        };
-      }
-
-      case "setGameFolder": {
-        props.store.set("gameFolder", action.payload);
-
-        return {
-          ...state,
-          config: { ...props.store.store, gameFolder: action.payload },
-          gameXML: new GameXML(action.payload)
-        };
-      }
-
-      case "setModletFolder": {
-        props.store.set("modletFolder", action.payload);
-
-        return {
-          ...state,
-          config: { ...props.store.store, modletFolder: action.payload },
-          modlets: getModlets(action.payload)
-        };
-      }
-
-      case "setModlets": {
-        return {
-          ...state,
-          modlets: action.payload.sort(sortModlets)
-        };
-      }
-
-      case "clearModlets": {
-        return {
-          ...state,
-          modlets: []
-        };
-      }
-
-      case "syncModlets": {
-        const modletState = state.modlets.filter((obj: IModletState) => obj.modlet === action.payload.modlet)[0];
-
-        if (!modletState) throw new Error("syncModlets dispatch received invalid modlet");
-
-        const modletStates = state.modlets.filter((obj: IModletState) => obj.modlet !== action.payload.modlet);
-        const newModletState = { ...modletState, ...action.payload };
-
-        return {
-          ...state,
-          modlets: [...modletStates, newModletState].sort(sortModlets)
-        };
-      }
-
-      case "setGameXML": {
-        return {
-          ...state,
-          gameXML: new GameXML(state.config.gameFolder)
-        };
-      }
-
-      default:
-        return state;
-    }
-  };
-
-  const [state, stateDispatch] = useReducer(stateReducer, initialState, initState);
+  const [state, stateDispatch] = stateReducer(config);
 
   const errorDialog = (title: string, err: Error) => {
     remote.dialog.showMessageBox({
@@ -167,7 +76,7 @@ function App(props: AppProps): React.ReactElement {
   };
 
   const launchGame = () => {
-    const game = path.normalize(path.join(state.config.gameFolder, gameExecutable));
+    const game = path.normalize(path.join(state.config.store.gameFolder, gameExecutable));
 
     if (fileExists(game))
       execFile(game, err => {
@@ -181,11 +90,13 @@ function App(props: AppProps): React.ReactElement {
   const refreshModlets = useCallback(
     (modletsPath?: string) => {
       let newModletList = getModlets(
-        modletsPath || state.advancedMode ? state.config.modletFolder : path.join(state.config.gameFolder, "Mods")
+        modletsPath || state.advancedMode
+          ? state.config.store.modletFolder
+          : path.join(state.config.store.gameFolder, "Mods")
       );
       if (newModletList.length) stateDispatch({ type: "setModlets", payload: newModletList });
     },
-    [state.advancedMode, state.config.gameFolder, state.config.modletFolder]
+    [state.advancedMode, state.config.store.gameFolder, state.config.store.modletFolder]
   );
 
   const getFolder = async (title: string) => {
@@ -208,7 +119,7 @@ function App(props: AppProps): React.ReactElement {
       if (newFolder) {
         if (fileExists(path.join(newFolder, gameExecutable))) {
           stateDispatch({ type: "setGameFolder", payload: newFolder });
-          if (!state.config.modletFolder) {
+          if (!state.config.store.modletFolder) {
             const newModletFolder = path.posix.join(newFolder, "Mods");
             stateDispatch({ type: "setModletFolder", payload: newModletFolder });
           } else {
@@ -219,7 +130,7 @@ function App(props: AppProps): React.ReactElement {
         }
       }
     });
-  }, [refreshModlets, state.config.modletFolder]);
+  }, [refreshModlets, state.config.store.modletFolder]);
 
   const getModletFolder = () => {
     getFolder('Please Select a valid "7 Days to Die" Modlet Folder').then(newFolder => {
@@ -235,25 +146,25 @@ function App(props: AppProps): React.ReactElement {
   };
 
   useEffect(() => {
-    if (!state.config.gameFolder) getGameFolder();
-  }, [state.config.gameFolder, getGameFolder]);
+    if (!state.config.store.gameFolder) getGameFolder();
+  }, [state.config.store.gameFolder, getGameFolder]);
 
   useEffect(() => {
-    if (state.config.mode === undefined) stateDispatch({ type: "setAdvancedMode", payload: false });
-  }, [state.config.mode]);
+    if (state.config.store.mode === undefined) stateDispatch({ type: "setAdvancedMode", payload: false });
+  }, [state.config.store.mode]);
 
   useEffect(() => {
-    if (!loading && !state.config.modletFolder && state.config.gameFolder) {
-      const newModletFolder = path.join(state.config.gameFolder, "Mods");
+    if (!loading && !state.config.store.modletFolder && state.config.store.gameFolder) {
+      const newModletFolder = path.join(state.config.store.gameFolder, "Mods");
       stateDispatch({ type: "setModletFolder", payload: newModletFolder });
     }
-  }, [loading, state.config.gameFolder, state.config.modletFolder]);
+  }, [loading, state.config.store.gameFolder, state.config.store.modletFolder]);
 
   useEffect(() => {
-    if (state.config.modletFolder && state.config.gameFolder) refreshModlets();
-  }, [refreshModlets, state.config.modletFolder, state.config.gameFolder]);
+    if (state.config.store.modletFolder && state.config.store.gameFolder) refreshModlets();
+  }, [refreshModlets, state.config.store.modletFolder, state.config.store.gameFolder]);
 
-  if (!loading && (state === undefined || state.config.gameFolder === undefined)) {
+  if (!loading && (state === undefined || state.config.store.gameFolder === undefined)) {
     return (
       <Button variant="contained" color="secondary" onClick={getGameFolder} className={classes.noGameFolder}>
         Please Select the 7 days to die game folder to continue...
@@ -261,7 +172,7 @@ function App(props: AppProps): React.ReactElement {
     );
   }
 
-  if (loading && (!state.config.gameFolder || !state.config.modletFolder))
+  if (loading && (!state.config.store.gameFolder || !state.config.store.modletFolder))
     return <CircularProgress className={classes.noGameFolder} />;
 
   const commands = {
@@ -300,7 +211,7 @@ function App(props: AppProps): React.ReactElement {
           <List dense={true}>
             <FolderPicker
               advancedMode={state.advancedMode}
-              folder={state.config.gameFolder}
+              folder={state.config.store.gameFolder}
               handleClick={getGameFolder}
               label="Game Folder"
               toolTip="Click to select Game Folder"
@@ -308,7 +219,7 @@ function App(props: AppProps): React.ReactElement {
             <Collapse in={state.advancedMode}>
               <FolderPicker
                 advancedMode={state.advancedMode}
-                folder={state.config.modletFolder}
+                folder={state.config.store.modletFolder}
                 handleClick={getModletFolder}
                 label="Modlet Folder"
                 toolTip="Click to select Modlet folder"

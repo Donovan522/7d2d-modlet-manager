@@ -68,7 +68,7 @@ function Modlets(props: ModletsProps): React.ReactElement {
   const [validating, setValidating] = useState(false);
   const [validateButtonLabel, setValidateButtonLabel] = useState("Validate XMLs");
   const classes = useStyles();
-  const modsPath = state.config.gameFolder ? path.win32.normalize(path.join(state.config.gameFolder, "Mods")) : "";
+  const modsPath = state.gameFolder ? path.win32.normalize(path.join(state.gameFolder, "Mods")) : "";
 
   const handleValidation = async (modletState: IModletState) => {
     let errors = [];
@@ -183,7 +183,7 @@ function Modlets(props: ModletsProps): React.ReactElement {
         </Button>
       );
     }
-  }, [state.config.gameFolder, noModsButton, modsPath, classes.noModsButton]);
+  }, [state.gameFolder, noModsButton, modsPath, classes.noModsButton]);
 
   return (
     <Grid container spacing={2} className={classes.root}>
