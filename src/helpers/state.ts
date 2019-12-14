@@ -13,13 +13,15 @@ const defaultState: IState = {
 
 function initialState(config: any): IState {
   const gameFolder = config.get("gameFolder");
+  const modletFolder = config.get("modletFolder");
+  const advancedMode = !!+config.get("mode");
 
   return {
     config,
     gameFolder,
-    advancedMode: !!parseInt(config.get("mode")),
+    modletFolder,
+    advancedMode,
     gameXML: gameFolder && fileExists(gameFolder) ? new GameXML(gameFolder) : null,
-    modletFolder: config.get("modletFolder"),
     modlets: []
   };
 }
@@ -33,6 +35,7 @@ function reducer(state: IState, action: { type: string; payload?: any }): IState
 
   switch (action.type) {
     case "setAdvancedMode": {
+      state.config.set("mode", +action.payload);
       return {
         ...state,
         advancedMode: action.payload
@@ -40,6 +43,7 @@ function reducer(state: IState, action: { type: string; payload?: any }): IState
     }
 
     case "setGameFolder": {
+      state.config.set("gameFolder", action.payload);
       return {
         ...state,
         gameFolder: action.payload,
@@ -55,6 +59,7 @@ function reducer(state: IState, action: { type: string; payload?: any }): IState
     }
 
     case "setModletFolder": {
+      state.config.set("modletFolder", action.payload);
       return {
         ...state,
         modletFolder: action.payload,
