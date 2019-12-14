@@ -21,6 +21,7 @@ import path from "path";
 import React, { useCallback, useEffect, useState } from "react";
 import { hot } from "react-hot-loader";
 import menuTemplate from "./menu";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
@@ -45,7 +46,13 @@ const useStyles = makeStyles(theme => ({
   noGameFolder: {
     display: "block",
     margin: "auto",
-    marginTop: 200
+    marginTop: 200,
+    textAlign: "center"
+  },
+  noGameFolderIcon: {
+    display: "block",
+    margin: "auto",
+    marginTop: 25
   },
   launchButton: {
     margin: theme.spacing(1)
@@ -76,7 +83,7 @@ function App({ config }: AppProps): React.ReactElement {
   };
 
   const launchGame = () => {
-    const game = path.normalize(path.join(state.config.store.gameFolder, gameExecutable));
+    const game = path.normalize(path.join(state.gameFolder, gameExecutable));
 
     if (fileExists(game))
       execFile(game, err => {
@@ -90,13 +97,11 @@ function App({ config }: AppProps): React.ReactElement {
   const refreshModlets = useCallback(
     (modletsPath?: string) => {
       let newModletList = getModlets(
-        modletsPath || state.advancedMode
-          ? state.config.store.modletFolder
-          : path.join(state.config.store.gameFolder, "Mods")
+        modletsPath || state.advancedMode ? state.modletFolder : path.join(state.gameFolder, "Mods")
       );
       if (newModletList.length) stateDispatch({ type: "setModlets", payload: newModletList });
     },
-    [state.advancedMode, state.config.store.gameFolder, state.config.store.modletFolder]
+    [stateDispatch, state.advancedMode, state.gameFolder, state.modletFolder]
   );
 
   const getFolder = async (title: string) => {
@@ -119,7 +124,7 @@ function App({ config }: AppProps): React.ReactElement {
       if (newFolder) {
         if (fileExists(path.join(newFolder, gameExecutable))) {
           stateDispatch({ type: "setGameFolder", payload: newFolder });
-          if (!state.config.store.modletFolder) {
+          if (!state.modletFolder) {
             const newModletFolder = path.posix.join(newFolder, "Mods");
             stateDispatch({ type: "setModletFolder", payload: newModletFolder });
           } else {
@@ -130,7 +135,7 @@ function App({ config }: AppProps): React.ReactElement {
         }
       }
     });
-  }, [refreshModlets, state.config.store.modletFolder]);
+  }, [stateDispatch, refreshModlets, state.modletFolder]);
 
   const getModletFolder = () => {
     getFolder('Please Select a valid "7 Days to Die" Modlet Folder').then(newFolder => {
@@ -145,35 +150,50 @@ function App({ config }: AppProps): React.ReactElement {
     stateDispatch({ type: "setAdvancedMode", payload: !state.advancedMode });
   };
 
+  // Check for invalid gameFolder
   useEffect(() => {
-    if (!state.config.store.gameFolder) getGameFolder();
-  }, [state.config.store.gameFolder, getGameFolder]);
+    if (state.gameFolder && !fileExists(state.gameFolder)) stateDispatch({ type: "clearGameFolder" });
+  }, [stateDispatch, state.gameFolder]);
+
+  // Check for empty gameFolder
+  useEffect(() => {
+    if (!state.gameFolder) getGameFolder();
+  }, [state.gameFolder, getGameFolder]);
+
+  // If advancedMode isn't already set, set it to default
+  useEffect(() => {
+    if (state.advancedMode === undefined) stateDispatch({ type: "setAdvancedMode", payload: false });
+  }, [stateDispatch, state.advancedMode]);
 
   useEffect(() => {
-    if (state.config.store.mode === undefined) stateDispatch({ type: "setAdvancedMode", payload: false });
-  }, [state.config.store.mode]);
-
-  useEffect(() => {
-    if (!loading && !state.config.store.modletFolder && state.config.store.gameFolder) {
-      const newModletFolder = path.join(state.config.store.gameFolder, "Mods");
+    if (!loading && !state.modletFolder && state.gameFolder) {
+      const newModletFolder = path.join(state.gameFolder, "Mods");
       stateDispatch({ type: "setModletFolder", payload: newModletFolder });
     }
-  }, [loading, state.config.store.gameFolder, state.config.store.modletFolder]);
+  }, [stateDispatch, loading, state.gameFolder, state.modletFolder]);
 
   useEffect(() => {
-    if (state.config.store.modletFolder && state.config.store.gameFolder) refreshModlets();
-  }, [refreshModlets, state.config.store.modletFolder, state.config.store.gameFolder]);
+    if (state.modletFolder && state.gameFolder) refreshModlets();
+  }, [refreshModlets, state.modletFolder, state.gameFolder]);
 
-  if (!loading && (state === undefined || state.config.store.gameFolder === undefined)) {
+  if (!loading && (state.config === undefined || !state.gameFolder)) {
     return (
       <Button variant="contained" color="secondary" onClick={getGameFolder} className={classes.noGameFolder}>
-        Please Select the 7 days to die game folder to continue...
+        Please Select the 7 days to die game folder to continue.
       </Button>
     );
   }
 
-  if (loading && (!state.config.store.gameFolder || !state.config.store.modletFolder))
-    return <CircularProgress className={classes.noGameFolder} />;
+  if (loading && (!state.gameFolder || !state.modletFolder)) {
+    return (
+      <Box>
+        <Typography variant="h5" className={classes.noGameFolder}>
+          Waiting for Selection
+        </Typography>
+        <CircularProgress className={classes.noGameFolderIcon} />
+      </Box>
+    );
+  }
 
   const commands = {
     chooseGameFolder: getGameFolder,
@@ -211,7 +231,7 @@ function App({ config }: AppProps): React.ReactElement {
           <List dense={true}>
             <FolderPicker
               advancedMode={state.advancedMode}
-              folder={state.config.store.gameFolder}
+              folder={state.gameFolder}
               handleClick={getGameFolder}
               label="Game Folder"
               toolTip="Click to select Game Folder"
@@ -219,7 +239,7 @@ function App({ config }: AppProps): React.ReactElement {
             <Collapse in={state.advancedMode}>
               <FolderPicker
                 advancedMode={state.advancedMode}
-                folder={state.config.store.modletFolder}
+                folder={state.modletFolder}
                 handleClick={getModletFolder}
                 label="Modlet Folder"
                 toolTip="Click to select Modlet folder"

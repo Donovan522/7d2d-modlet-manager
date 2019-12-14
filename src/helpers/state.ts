@@ -1,6 +1,6 @@
 import getModlets from "helpers/get_modlets";
 import { useReducer } from "react";
-import { GameXML } from ".";
+import { GameXML, fileExists } from ".";
 
 const defaultState: IState = {
   advancedMode: false,
@@ -12,11 +12,13 @@ const defaultState: IState = {
 };
 
 function initialState(config: any): IState {
+  const gameFolder = config.get("gameFolder");
+
   return {
-    config: config,
+    config,
+    gameFolder,
     advancedMode: !!parseInt(config.get("mode")),
-    gameFolder: config.get("gameFolder"),
-    gameXML: config.get("gameFolder") ? new GameXML(config.get("gameFolder")) : null,
+    gameXML: gameFolder && fileExists(gameFolder) ? new GameXML(gameFolder) : null,
     modletFolder: config.get("modletFolder"),
     modlets: []
   };
@@ -27,10 +29,10 @@ function sortModlets(a: IModletState, b: IModletState) {
 }
 
 function reducer(state: IState, action: { type: string; payload?: any }): IState {
+  console.info("Received dispatch:", action);
+
   switch (action.type) {
     case "setAdvancedMode": {
-      if (state.config) state.config.set("mode", action.payload ? 1 : 0);
-
       return {
         ...state,
         advancedMode: action.payload
@@ -38,8 +40,6 @@ function reducer(state: IState, action: { type: string; payload?: any }): IState
     }
 
     case "setGameFolder": {
-      if (state.config) state.config.set("gameFolder", action.payload);
-
       return {
         ...state,
         gameFolder: action.payload,
@@ -47,9 +47,14 @@ function reducer(state: IState, action: { type: string; payload?: any }): IState
       };
     }
 
-    case "setModletFolder": {
-      if (state.config) state.config.set("modletFolder", action.payload);
+    case "clearGameFolder": {
+      return {
+        ...state,
+        gameFolder: ""
+      };
+    }
 
+    case "setModletFolder": {
       return {
         ...state,
         modletFolder: action.payload,
@@ -97,4 +102,4 @@ function reducer(state: IState, action: { type: string; payload?: any }): IState
   }
 }
 
-export default (config: any) => useReducer(reducer, initialState(config || defaultState));
+export default (config: any) => useReducer(reducer, defaultState, () => initialState(config));
