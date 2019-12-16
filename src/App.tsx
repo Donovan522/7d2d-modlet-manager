@@ -15,7 +15,6 @@ import FolderPicker from "components/FolderPicker";
 import Modlets from "components/Modlets";
 import { remote } from "electron";
 import { fileExists, getModlets } from "helpers";
-import stateReducer from "helpers/state";
 import theme from "helpers/theme";
 import path from "path";
 import React, { useCallback, useEffect, useState } from "react";
@@ -64,15 +63,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface AppProps {
-  config: any;
+  state: IState;
+  stateDispatch: (action: { type: string; payload?: any }) => IState;
 }
 
-function App({ config }: AppProps): React.ReactElement {
+function App({ state, stateDispatch }: AppProps): React.ReactElement {
   const classes = useStyles();
   const gameExecutable = "7DaysToDie.exe";
   // const gameExecutableEAC = "7DaysToDie_EAC.exe";
   const [loading, setLoading] = useState(false);
-  const [state, stateDispatch] = stateReducer(config);
 
   const errorDialog = (title: string, err: Error) => {
     remote.dialog.showMessageBox({

@@ -2,8 +2,17 @@ import Store from "electron-store";
 import unhandled from "electron-unhandled";
 import React from "react";
 import ReactDOM from "react-dom";
+import stateReducer from "helpers/state";
 import App from "./App";
 
+require("electron-react-devtools").install();
 unhandled();
 
-ReactDOM.render(<App config={new Store({ name: "7d2dmm" })} />, document.getElementById("root"));
+function State() {
+  const config = new Store({ name: "7d2dmm" });
+  const [state, stateDispatch] = stateReducer(config);
+
+  return <App state={state} stateDispatch={stateDispatch} />;
+}
+
+ReactDOM.render(<State />, document.getElementById("root"));

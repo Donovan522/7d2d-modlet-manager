@@ -1,9 +1,8 @@
 import App from "App";
 import React from "react";
 import mock_store from "test_helpers/mock_store";
+import mock_state from "test_helpers/mock_state";
 import { render } from "@testing-library/react";
-import mock_fs from "mock-fs";
-import path from "path";
 
 jest.mock("electron", () => ({
   remote: {
@@ -24,15 +23,8 @@ jest.mock("electron-util", () => ({
   aboutMenuItem: jest.fn()
 }));
 
-mock_fs({
-  [path.posix.normalize(mock_store.store.gameFolder)]: {
-    "7DaysToDie.exe": ""
-  },
-  [path.posix.normalize(mock_store.store.modletFolder)]: {}
-});
-
 it("renders without crashing", () => {
-  const { asFragment } = render(<App config={mock_store} />);
+  const { asFragment } = render(<App state={mock_state} stateDispatch={jest.fn()} />);
 
   expect(asFragment()).toMatchSnapshot();
 });

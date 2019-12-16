@@ -5,6 +5,7 @@ import mock_state from "test_helpers/mock_state";
 import { render } from "@testing-library/react";
 
 let modletState;
+const table = document.createElement("table");
 
 describe("Modlet", () => {
   beforeEach(() => {
@@ -36,7 +37,11 @@ describe("Modlet", () => {
 
     it("should render correctly", () => {
       const { asFragment } = render(
-        <Modlet state={mock_state} modletState={modletState} handleValidation={jest.fn()} />
+        <Modlet state={mock_state} modletState={modletState} handleValidation={jest.fn()} />,
+        {
+          container: document.body.appendChild(table),
+          wrapper: "tbody"
+        }
       );
 
       expect(asFragment()).toMatchSnapshot();
