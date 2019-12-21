@@ -5,7 +5,6 @@ import ReactDOM from "react-dom";
 import stateReducer from "helpers/state";
 import App from "./App";
 
-require("electron-react-devtools").install();
 unhandled();
 
 function State() {

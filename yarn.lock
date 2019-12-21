@@ -4241,11 +4241,6 @@ electron-publish@21.2.0:
     lazy-val "^1.0.4"
     mime "^2.4.4"
 
-electron-react-devtools@^0.5.3:
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/electron-react-devtools/-/electron-react-devtools-0.5.3.tgz#c74edb1245dc1cfe1380b93016cd4eb588ed00b7"
-  integrity sha1-x07bEkXcHP4TgLkwFs1OtYjtALc=
-
 electron-store@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/electron-store/-/electron-store-5.1.0.tgz#0b3cb66b15d0002678fc5c13e8b0c38a8678d670"
