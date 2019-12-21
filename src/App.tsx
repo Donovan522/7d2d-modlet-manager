@@ -33,6 +33,13 @@ const useStyles = makeStyles(theme => ({
     overflowY: "auto",
     height: "100%"
   },
+  footerContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: theme.palette.background.paper,
+    borderTop: "1px solid silver"
+  },
   controlsContainer: {
     display: "flex",
     flexDirection: "row",
@@ -59,6 +66,9 @@ const useStyles = makeStyles(theme => ({
   launchIcon: {
     marginRight: theme.spacing(1),
     color: theme.palette.secondary.main
+  },
+  footer: {
+    margin: theme.spacing(1)
   }
 }));
 
@@ -247,6 +257,14 @@ function App({ state, stateDispatch }: AppProps): React.ReactElement {
           </List>
           <Modlets state={state} stateDispatch={stateDispatch} />
         </Container>
+        <Box className={classes.footerContainer}>
+          <Typography className={classes.footer} component="div">
+            {remote.app.name}
+          </Typography>
+          <Typography className={classes.footer} component="div">
+            Version v.{remote.app.getVersion()}
+          </Typography>
+        </Box>
       </Box>
     </ThemeProvider>
   );

@@ -1,6 +1,4 @@
-const electron = require("electron");
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
+const { app, BrowserWindow } = require("electron");
 const grey = require("@material-ui/core/colors/grey");
 const path = require("path");
 const isDev = require("electron-is-dev");

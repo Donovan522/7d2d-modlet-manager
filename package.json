@@ -1,7 +1,9 @@
 {
   "name": "7d2d-modlet-manager",
-  "description": "7 Days to Die Modlet Manager",
-  "version": "0.2.1",
+  "productName": "7D2D Modlet Manager",
+  "description": "7 Days to Die - Modlet Manager",
+  "copyright": "Copyright © 2019 Donovan C. Young",
+  "version": "0.3.0",
   "repository": "https://github.com/Donovan522/7d2d-modlet-manager",
   "homepage": "./",
   "keywords": [
@@ -17,8 +19,6 @@
   },
   "build": {
     "appId": "com.donovanyoung.7d2d-modlet-manager",
-    "productName": "7 Days to Die Modlet Manager",
-    "copyright": "Copyright © 2019 Donovan C. Young",
     "mac": {
       "category": "public.app-category.utilities"
     },

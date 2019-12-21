@@ -3,29 +3,29 @@
 exports[`renders without crashing 1`] = `
 <DocumentFragment>
   <div
-    class="MuiBox-root MuiBox-root-10 makeStyles-mainContainer-1"
+    class="MuiBox-root MuiBox-root-12 makeStyles-mainContainer-1"
   >
     <div
       class="MuiContainer-root makeStyles-bodyContainer-2 MuiContainer-maxWidthXl"
     >
       <div
-        class="MuiBox-root MuiBox-root-19 makeStyles-controlsContainer-3"
+        class="MuiBox-root MuiBox-root-21 makeStyles-controlsContainer-4"
       >
         <label
-          class="MuiFormControlLabel-root makeStyles-modeControl-4"
+          class="MuiFormControlLabel-root makeStyles-modeControl-5"
         >
           <span
             class="MuiSwitch-root MuiSwitch-sizeSmall"
           >
             <span
               aria-disabled="false"
-              class="MuiButtonBase-root MuiIconButton-root PrivateSwitchBase-root-38 MuiSwitch-switchBase MuiSwitch-colorSecondary"
+              class="MuiButtonBase-root MuiIconButton-root PrivateSwitchBase-root-40 MuiSwitch-switchBase MuiSwitch-colorSecondary"
             >
               <span
                 class="MuiIconButton-label"
               >
                 <input
-                  class="PrivateSwitchBase-input-41 MuiSwitch-input"
+                  class="PrivateSwitchBase-input-43 MuiSwitch-input"
                   type="checkbox"
                   value=""
                 />
@@ -49,7 +49,7 @@ exports[`renders without crashing 1`] = `
         </label>
         <button
           aria-label="Launch 7 Days to Die"
-          class="MuiButtonBase-root MuiFab-root makeStyles-launchButton-7 MuiFab-extended MuiFab-sizeMedium MuiFab-primary"
+          class="MuiButtonBase-root MuiFab-root makeStyles-launchButton-8 MuiFab-extended MuiFab-sizeMedium MuiFab-primary"
           tabindex="0"
           type="button"
         >
@@ -58,7 +58,7 @@ exports[`renders without crashing 1`] = `
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root makeStyles-launchIcon-8"
+              class="MuiSvgIcon-root makeStyles-launchIcon-9"
               focusable="false"
               role="presentation"
               viewBox="0 0 24 24"
@@ -78,7 +78,7 @@ exports[`renders without crashing 1`] = `
         class="MuiList-root MuiList-dense MuiList-padding"
       >
         <li
-          class="MuiListItem-root makeStyles-listItem-107 MuiListItem-dense MuiListItem-gutters"
+          class="MuiListItem-root makeStyles-listItem-109 MuiListItem-dense MuiListItem-gutters"
           color="secondary"
           title="Click to select Game Folder"
         >
@@ -123,7 +123,7 @@ exports[`renders without crashing 1`] = `
               class="MuiCollapse-wrapperInner"
             >
               <li
-                class="MuiListItem-root makeStyles-listItem-107 MuiListItem-dense MuiListItem-gutters"
+                class="MuiListItem-root makeStyles-listItem-109 MuiListItem-dense MuiListItem-gutters"
                 color="secondary"
                 title="Click to select Modlet folder"
               >
@@ -162,13 +162,13 @@ exports[`renders without crashing 1`] = `
         </div>
       </ul>
       <div
-        class="MuiGrid-root makeStyles-root-149 MuiGrid-container MuiGrid-spacing-xs-2"
+        class="MuiGrid-root makeStyles-root-151 MuiGrid-container MuiGrid-spacing-xs-2"
       >
         <div
-          class="MuiGrid-root makeStyles-cardEmpty-145 MuiGrid-item"
+          class="MuiGrid-root makeStyles-cardEmpty-147 MuiGrid-item"
         >
           <h6
-            class="MuiTypography-root makeStyles-noModletsHeader-146 MuiTypography-h6"
+            class="MuiTypography-root makeStyles-noModletsHeader-148 MuiTypography-h6"
           >
             No Modlets Installed
           </h6>
@@ -176,12 +176,26 @@ exports[`renders without crashing 1`] = `
             class="MuiDivider-root MuiDivider-middle"
           />
           <p
-            class="MuiTypography-root makeStyles-noModletsBody-147 MuiTypography-body1"
+            class="MuiTypography-root makeStyles-noModletsBody-149 MuiTypography-body1"
           >
             To install mods, place them in \\foo\\bar\\Mods
             <span />
           </p>
         </div>
+      </div>
+    </div>
+    <div
+      class="MuiBox-root MuiBox-root-264 makeStyles-footerContainer-3"
+    >
+      <div
+        class="MuiTypography-root makeStyles-footer-10 MuiTypography-body1"
+      >
+        7d2d modlet manager TEST
+      </div>
+      <div
+        class="MuiTypography-root makeStyles-footer-10 MuiTypography-body1"
+      >
+        Version v.0.0.1
       </div>
     </div>
   </div>

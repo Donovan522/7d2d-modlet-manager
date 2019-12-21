@@ -6,6 +6,10 @@ import { render } from "@testing-library/react";
 
 jest.mock("electron", () => ({
   remote: {
+    app: {
+      name: "7d2d modlet manager TEST",
+      getVersion: jest.fn(() => "0.0.1")
+    },
     Menu: {
       buildFromTemplate: jest.fn(),
       setApplicationMenu: jest.fn()
