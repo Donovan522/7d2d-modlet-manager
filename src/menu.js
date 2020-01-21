@@ -2,6 +2,8 @@ import path from "path";
 import { aboutMenuItem } from "electron-util";
 
 const iconPath = path.join("public", "favicon.ico");
+const homePage = "https://github.com/dyoung522/7d2d-modlet-manager";
+const wikiPage = homePage + "/wiki";
 const template = commands => [
   {
     label: "File",
@@ -35,14 +37,14 @@ const template = commands => [
     submenu: [
       aboutMenuItem({
         icon: iconPath,
-        copyright: "Copyright © Donovan C. Young",
-        text: "7 Days to Die Modlet Manager"
+        copyright: "Donovan C. Young",
+        text: `Thanks for using the 7 Days to Die Modlet Manager.\n\nFor more information, please visit us at ${homePage}`
       }),
       {
         label: "Learn More",
         click: async () => {
           const { shell } = require("electron");
-          await shell.openExternal("https://gitlab.com/dyoung522/7d2d-modlet-manager/wikis/home");
+          await shell.openExternal(wikiPage);
         }
       }
     ]
