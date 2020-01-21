@@ -1,4 +1,4 @@
-# Welcome to the 7 Days to Die Modlet Manager Wiki
+# Welcome to the 7 Days to Die Modlet Manager
 
 This project is intended for a few different audiences;
 
