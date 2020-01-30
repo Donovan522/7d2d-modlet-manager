@@ -10,7 +10,7 @@ abstract class Modlet {
 }
 
 abstract class GameXML {
-  abstract reset(): void;
+  abstract reset(hard?: boolean): void;
   abstract validate(modlet: Modlet): Promise<string[]>;
 }
 

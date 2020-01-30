@@ -5,11 +5,22 @@ export default class GameXML {
   private _gameFolder: string;
   private _configFolder: string;
   private _gameXML: XMLDocument;
+  private _gameXMLCache: XMLDocument;
 
   constructor(gameFolder: string) {
     this._gameFolder = gameFolder;
     this._configFolder = path.normalize(path.join(this._gameFolder, "Data", "Config"));
     this._gameXML = this.readGameXML(this.folderTree(this._configFolder));
+    this._gameXMLCache = this.copyXMLDocument(this._gameXML);
+  }
+
+  private copyXMLDocument(doc: XMLDocument) {
+    const newDoc = doc.implementation.createDocument(doc.namespaceURI, null, null);
+    const newNode = newDoc.importNode(doc.documentElement, true);
+
+    newDoc.appendChild(newNode);
+
+    return newDoc;
   }
 
   private folderTree(directory: string) {
@@ -77,8 +88,10 @@ export default class GameXML {
     }
   }
 
-  public reset() {
-    this._gameXML = this.readGameXML(this.folderTree(this._configFolder));
+  public reset(hard: boolean = false) {
+    if (hard) this._gameXMLCache = this.readGameXML(this.folderTree(this._configFolder));
+    this._gameXML = this.copyXMLDocument(this._gameXMLCache);
+    console.log(`Resetting gameXML (${hard ? "hard" : "soft"})`);
   }
 
   public validate(modlet: Modlet): Promise<string[]> {

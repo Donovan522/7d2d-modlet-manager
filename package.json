@@ -1,10 +1,11 @@
 {
+  "version": "0.3.1",
   "name": "7d2d-modlet-manager",
   "productName": "7D2D Modlet Manager",
   "description": "7 Days to Die - Modlet Manager",
   "copyright": "Copyright © 2019 Donovan C. Young",
-  "version": "0.3.0",
-  "repository": "https://github.com/Donovan522/7d2d-modlet-manager",
+  "main": "public/electron.js",
+  "repository": "https://github.com/dyoung522/7d2d-modlet-manager",
   "homepage": "./",
   "keywords": [
     "7 days to die",
@@ -48,7 +49,6 @@
       "buildResources": "build"
     }
   },
-  "main": "public/electron.js",
   "scripts": {
     "dev": "concurrently -k \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron --inspect .\"",
     "start": "rescripts start",

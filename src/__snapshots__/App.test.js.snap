@@ -44,7 +44,7 @@ exports[`renders without crashing 1`] = `
           <span
             class="MuiTypography-root MuiFormControlLabel-label MuiTypography-body1"
           >
-            Basic Mode
+            Advanced Mode
           </span>
         </label>
         <button
