@@ -1,5 +1,5 @@
 {
-  "version": "0.3.1",
+  "version": "0.3.2",
   "name": "7d2d-modlet-manager",
   "productName": "7D2D Modlet Manager",
   "description": "7 Days to Die - Modlet Manager",
@@ -30,6 +30,9 @@
       }
     ],
     "win": {
+      "publish": [
+        "github"
+      ],
       "target": [
         {
           "target": "nsis",
@@ -103,8 +106,10 @@
     "@material-ui/icons": "^4.5.1",
     "electron-debug": "^3.0.1",
     "electron-is-dev": "^1.1.0",
+    "electron-log": "^4.0.4",
     "electron-store": "^5.1.0",
     "electron-unhandled": "^3.0.1",
+    "electron-updater": "^4.2.0",
     "electron-util": "^0.13.0",
     "electron-window-state": "^5.0.3",
     "react": "^16.11.0",

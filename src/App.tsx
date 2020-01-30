@@ -13,7 +13,7 @@ import LaunchIcon from "@material-ui/icons/Launch";
 import { execFile } from "child_process";
 import FolderPicker from "components/FolderPicker";
 import Modlets from "components/Modlets";
-import { remote } from "electron";
+import { remote, ipcRenderer } from "electron";
 import { fileExists, getModlets } from "helpers";
 import theme from "helpers/theme";
 import path from "path";
@@ -205,6 +205,7 @@ function App({ state, stateDispatch }: AppProps): React.ReactElement {
   }
 
   const commands = {
+    checkForUpdates: ipcRenderer.sendSync("checkForUpdates"),
     chooseGameFolder: getGameFolder,
     chooseModletFolder: getModletFolder,
     toggleMode: toggleAdvancedMode,
