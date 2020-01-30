@@ -205,7 +205,10 @@ function App({ state, stateDispatch }: AppProps): React.ReactElement {
   }
 
   const commands = {
-    checkForUpdates: ipcRenderer.sendSync("checkForUpdates"),
+    // checkForUpdates: ipcRenderer.sendSync("checkForUpdates"),
+    checkForUpdates: () => {
+      console.log("Update checks go here");
+    },
     chooseGameFolder: getGameFolder,
     chooseModletFolder: getModletFolder,
     toggleMode: toggleAdvancedMode,
