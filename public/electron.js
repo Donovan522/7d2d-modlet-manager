@@ -1,15 +1,20 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
+const checkForUpdates = require("./updater");
 const grey = require("@material-ui/core/colors/grey");
 const path = require("path");
 const isDev = require("electron-is-dev");
 const windowStateKeeper = require("electron-window-state");
 const unhandled = require("electron-unhandled");
+const log = require("electron-log");
+
+log.info("App starting...");
 
 unhandled();
 
 let mainWindow;
 
 function createWindow() {
+  log.info("starting main process...");
   let state = windowStateKeeper({
     defaultWidth: 1024,
     defaultHeight: 768
@@ -41,14 +46,22 @@ function createWindow() {
     //   Remove the "%APPDATA%/[project]/DevTools Extension" file to fix.
     // DO NOT USE: BrowserWindow.addDevToolsExtension(path.join(__dirname, "../node_modules/electron-react-devtools"));
     mainWindow.webContents.openDevTools();
+  } else {
+    checkForUpdates();
   }
 
   mainWindow.on("closed", () => (mainWindow = null));
 }
 
+ipcMain.on("checkForUpdates", event => {
+  event.returnValue = checkForUpdates;
+});
+
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
+  log.info("App quitting");
+
   if (process.platform !== "darwin") {
     app.quit();
   }
