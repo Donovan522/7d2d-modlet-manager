@@ -36,11 +36,10 @@ function createWindow() {
   if (isDev) {
     delete process.env.ELECTRON_ENABLE_SECURITY_WARNINGS;
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
-    // Open the DevTools.
     // Note to my future self:
     //   `electron-react-devtools` does NOT work, and will cause hangs.
     //   Remove the "%APPDATA%/[project]/DevTools Extension" file to fix.
-    // BrowserWindow.addDevToolsExtension(path.join(__dirname, "../node_modules/electron-react-devtools"));
+    // DO NOT USE: BrowserWindow.addDevToolsExtension(path.join(__dirname, "../node_modules/electron-react-devtools"));
     mainWindow.webContents.openDevTools();
   }
 

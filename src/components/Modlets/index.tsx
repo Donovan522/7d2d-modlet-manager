@@ -70,11 +70,12 @@ function Modlets(props: ModletsProps): React.ReactElement {
   const classes = useStyles();
   const modsPath = state.gameFolder ? path.win32.normalize(path.join(state.gameFolder, "Mods")) : "";
 
-  const handleValidation = async (modletState: IModletState) => {
+  const handleValidation = async (modletState: IModletState, reset: boolean = true) => {
     let errors = [];
     if (state.gameXML) {
       errors = await state.gameXML.validate(modletState.modlet);
       stateDispatch({ type: "syncModlets", payload: { ...modletState, validated: true, errors: errors } });
+      if (reset) state.gameXML.reset();
     }
   };
 
@@ -87,7 +88,7 @@ function Modlets(props: ModletsProps): React.ReactElement {
         state.modlets.map((modletState: IModletState) => {
           // This runs the promises in single-order, so that they can dispatch between runs.
           // I still can't get the page to update fast enough, but that's a problem for another day.
-          return handleValidation(modletState);
+          return handleValidation(modletState, false);
         })
       ).then(() => {
         if (state.gameXML) state.gameXML.reset();

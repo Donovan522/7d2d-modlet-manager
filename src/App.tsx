@@ -106,7 +106,7 @@ function App({ state, stateDispatch }: AppProps): React.ReactElement {
   const refreshModlets = useCallback(
     (modletsPath?: string) => {
       let newModletList = getModlets(
-        modletsPath || state.advancedMode ? state.modletFolder : path.join(state.gameFolder, "Mods")
+        modletsPath || (state.advancedMode ? state.modletFolder : path.join(state.gameFolder, "Mods"))
       );
       if (newModletList.length) stateDispatch({ type: "setModlets", payload: newModletList });
     },
@@ -223,7 +223,8 @@ function App({ state, stateDispatch }: AppProps): React.ReactElement {
             <FormControlLabel
               className={classes.modeControl}
               control={<Switch size="small" checked={state.advancedMode} onChange={toggleAdvancedMode} />}
-              label={state.advancedMode ? "Advanced Mode" : "Basic Mode"}
+              // label={state.advancedMode ? "Advanced Mode" : "Advanced Mode (off)"}
+              label="Advanced Mode"
             />
             <Fab
               variant="extended"
