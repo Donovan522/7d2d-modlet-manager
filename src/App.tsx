@@ -83,6 +83,10 @@ function App({ state, stateDispatch }: AppProps): React.ReactElement {
   // const gameExecutableEAC = "7DaysToDie_EAC.exe";
   const [loading, setLoading] = useState(false);
 
+  const checkForUpdates = (fromMenu?: boolean) => {
+    ipcRenderer.send("checkForUpdates", fromMenu || false);
+  };
+
   const errorDialog = (title: string, err: Error) => {
     remote.dialog.showMessageBox({
       type: "error",
@@ -205,9 +209,12 @@ function App({ state, stateDispatch }: AppProps): React.ReactElement {
   }
 
   const commands = {
-    // checkForUpdates: ipcRenderer.sendSync("checkForUpdates"),
-    checkForUpdates: () => {
-      console.log("Update checks go here");
+    checkForUpdates: (menuItem: any) => {
+      menuItem.enabled = false;
+      ipcRenderer.on("enableMenu", () => {
+        menuItem.enabled = true;
+      });
+      checkForUpdates(true);
     },
     chooseGameFolder: getGameFolder,
     chooseModletFolder: getModletFolder,

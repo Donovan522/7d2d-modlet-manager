@@ -1,9 +1,7 @@
 import path from "path";
 import { aboutMenuItem } from "electron-util";
-import { remote } from "electron";
 
 const iconPath = path.join("public", "favicon.ico");
-const isDev = remote.require("electron-is-dev");
 const homePage = "https://github.com/dyoung522/7d2d-modlet-manager";
 const wikiPage = homePage + "/wiki";
 const template = commands => [
@@ -51,7 +49,7 @@ const template = commands => [
       },
       {
         label: "Check for Updates",
-        click: isDev ? () => console.log("Check for Update disabled in Development Mode") : commands.checkForUpdates
+        click: commands.checkForUpdates
       }
     ]
   }

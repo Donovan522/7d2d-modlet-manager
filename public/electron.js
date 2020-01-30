@@ -1,11 +1,11 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
-const checkForUpdates = require("./updater");
+const { app, BrowserWindow, dialog, ipcMain } = require("electron");
+const { autoUpdater } = require("electron-updater");
 const grey = require("@material-ui/core/colors/grey");
+const log = require("electron-log");
 const path = require("path");
 const isDev = require("electron-is-dev");
 const windowStateKeeper = require("electron-window-state");
 const unhandled = require("electron-unhandled");
-const log = require("electron-log");
 
 log.info("App starting...");
 
@@ -46,21 +46,15 @@ function createWindow() {
     //   Remove the "%APPDATA%/[project]/DevTools Extension" file to fix.
     // DO NOT USE: BrowserWindow.addDevToolsExtension(path.join(__dirname, "../node_modules/electron-react-devtools"));
     mainWindow.webContents.openDevTools();
-  } else {
-    checkForUpdates();
   }
 
   mainWindow.on("closed", () => (mainWindow = null));
 }
 
-ipcMain.on("checkForUpdates", event => {
-  event.returnValue = checkForUpdates;
-});
-
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
-  log.info("App quitting");
+  setImmediate(() => log.info("App quitting"));
 
   if (process.platform !== "darwin") {
     app.quit();
@@ -71,4 +65,73 @@ app.on("activate", () => {
   if (mainWindow === null) {
     createWindow();
   }
+});
+
+//
+// Auto Updates
+//
+ipcMain.on("checkForUpdates", (event, fromMenu) => {
+  if (isDev) {
+    log.info("Checking for updates is disabled in Development mode");
+    return;
+  }
+
+  autoUpdater.autoDownload = false;
+  autoUpdater.allowPrerelease = true;
+  autoUpdater.logger = log;
+  autoUpdater.logger.transports.file.level = "info";
+
+  autoUpdater.on("error", error => {
+    const errorMessage = error == null ? "unknown" : (error.stack || error).toString();
+    log.error("error", errorMessage);
+    dialog.showErrorBox("Error: ", errorMessage);
+  });
+
+  autoUpdater.on("did-fail-load", error => {
+    const errorMessage = error == null ? "update check failed" : (error.stack || error).toString();
+    log.error("did-fail-load", errorMessage);
+    dialog.showErrorBox(
+      "Whoops! Something went wrong, please try again later.\nIf the problem persists, please report the following error:\n\n",
+      errorMessage
+    );
+  });
+
+  autoUpdater.on("update-available", () => {
+    dialog
+      .showMessageBox({
+        type: "info",
+        title: "Found Updates",
+        message: "Found updates, do you want update now?",
+        buttons: ["Sure", "No"]
+      })
+      .then(click => {
+        log.info("clicked is", click);
+        if (click.response === 0) autoUpdater.downloadUpdate();
+        else if (fromMenu) mainWindow.webContents.send("enableMenu");
+      });
+  });
+
+  autoUpdater.on("update-downloaded", () => {
+    dialog
+      .showMessageBox({
+        title: "Install Updates",
+        message: "Updates downloaded, application will restart for update..."
+      })
+      .then(() => {
+        setImmediate(() => autoUpdater.quitAndInstall());
+      });
+  });
+
+  if (fromMenu) {
+    autoUpdater.on("update-not-available", () => {
+      dialog
+        .showMessageBox({
+          title: "No Updates",
+          message: "Current version is up-to-date."
+        })
+        .then(mainWindow.webContents.send("enableMenu"));
+    });
+  }
+
+  autoUpdater.checkForUpdates();
 });
