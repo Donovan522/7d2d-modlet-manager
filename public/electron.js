@@ -7,14 +7,13 @@ const isDev = require("electron-is-dev");
 const windowStateKeeper = require("electron-window-state");
 const unhandled = require("electron-unhandled");
 
-log.info("App starting...");
+log.info("App starting");
 
 unhandled();
 
 let mainWindow;
 
 function createWindow() {
-  log.info("starting main process...");
   let state = windowStateKeeper({
     defaultWidth: 1024,
     defaultHeight: 768
@@ -70,7 +69,7 @@ app.on("activate", () => {
 //
 // Auto Updates
 //
-ipcMain.on("checkForUpdates", (event, fromMenu) => {
+ipcMain.on("checkForUpdate", (event, fromMenu) => {
   if (isDev) {
     log.info("Checking for updates is disabled in Development mode");
     return;
@@ -94,6 +93,7 @@ ipcMain.on("checkForUpdates", (event, fromMenu) => {
       "Whoops! Something went wrong, please try again later.\nIf the problem persists, please report the following error:\n\n",
       errorMessage
     );
+    mainWindow.webContents.send("updateComplete");
   });
 
   autoUpdater.on("update-available", () => {
@@ -105,9 +105,8 @@ ipcMain.on("checkForUpdates", (event, fromMenu) => {
         buttons: ["Sure", "No"]
       })
       .then(click => {
-        log.info("clicked is", click);
         if (click.response === 0) autoUpdater.downloadUpdate();
-        else if (fromMenu) mainWindow.webContents.send("enableMenu");
+        else mainWindow.webContents.send("updateComplete");
       });
   });
 
@@ -122,16 +121,15 @@ ipcMain.on("checkForUpdates", (event, fromMenu) => {
       });
   });
 
-  if (fromMenu) {
-    autoUpdater.on("update-not-available", () => {
-      dialog
-        .showMessageBox({
-          title: "No Updates",
-          message: "Current version is up-to-date."
-        })
-        .then(mainWindow.webContents.send("enableMenu"));
-    });
-  }
+  autoUpdater.on("update-not-available", () => {
+    if (fromMenu) {
+      dialog.showMessageBox({
+        title: "No Updates",
+        message: "Current version is up-to-date."
+      });
+    }
+    mainWindow.webContents.send("updateComplete");
+  });
 
   autoUpdater.checkForUpdates();
 });

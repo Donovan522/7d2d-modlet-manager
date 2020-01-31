@@ -49,7 +49,8 @@ const template = commands => [
       },
       {
         label: "Check for Updates",
-        click: commands.checkForUpdates
+        click: commands.checkUpdates.checkForUpdate,
+        enabled: commands.checkUpdates.enabled
       }
     ]
   }

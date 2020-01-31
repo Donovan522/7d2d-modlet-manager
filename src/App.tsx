@@ -22,6 +22,7 @@ import { hot } from "react-hot-loader";
 import menuTemplate from "./menu";
 import Typography from "@material-ui/core/Typography";
 
+const isDev = remote.require("electron-is-dev");
 const useStyles = makeStyles(theme => ({
   mainContainer: {
     display: "flex",
@@ -82,9 +83,18 @@ function App({ state, stateDispatch }: AppProps): React.ReactElement {
   const gameExecutable = "7DaysToDie.exe";
   // const gameExecutableEAC = "7DaysToDie_EAC.exe";
   const [loading, setLoading] = useState(false);
+  const [appUpdating, setAppUpdating] = useState(false);
+  const [appUpdated, setAppUpdated] = useState(false);
 
-  const checkForUpdates = (fromMenu?: boolean) => {
-    ipcRenderer.send("checkForUpdates", fromMenu || false);
+  const checkForUpdate = (fromMenu?: boolean) => {
+    ipcRenderer.on("updateComplete", () => {
+      setAppUpdating(false);
+    });
+
+    if (!appUpdating) {
+      ipcRenderer.send("checkForUpdate", fromMenu || false);
+      setAppUpdating(true);
+    }
   };
 
   const errorDialog = (title: string, err: Error) => {
@@ -209,12 +219,9 @@ function App({ state, stateDispatch }: AppProps): React.ReactElement {
   }
 
   const commands = {
-    checkForUpdates: (menuItem: any) => {
-      menuItem.enabled = false;
-      ipcRenderer.on("enableMenu", () => {
-        menuItem.enabled = true;
-      });
-      checkForUpdates(true);
+    checkUpdates: {
+      checkForUpdate: () => checkForUpdate(true),
+      enabled: !(isDev || appUpdating)
     },
     chooseGameFolder: getGameFolder,
     chooseModletFolder: getModletFolder,
@@ -224,6 +231,14 @@ function App({ state, stateDispatch }: AppProps): React.ReactElement {
 
   // @ts-ignore
   remote.Menu.setApplicationMenu(remote.Menu.buildFromTemplate(menuTemplate(commands)));
+
+  // Check for updates after launch
+  if (!appUpdated && !appUpdating) {
+    setTimeout(() => {
+      checkForUpdate();
+      setAppUpdated(true);
+    }, 5000);
+  }
 
   return (
     <ThemeProvider theme={theme}>
